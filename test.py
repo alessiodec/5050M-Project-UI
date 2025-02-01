@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import make_classification
 from sklearn.svm import SVC
 
-st.set_option('deprecation.showPyplotGlobalUse', False)
-
 # App Title
 st.title("Interactive ML Diagrams with Streamlit")
 
@@ -21,22 +19,20 @@ points = np.random.rand(num_points, 2)
 
 def is_pareto_efficient(costs):
     """
-    Find the Pareto-efficient points
+    Find the Pareto-efficient points.
     Input:
         costs: An (n_points, n_costs) array
     Returns:
-        A boolean array of indices that are Pareto efficient.
+        A boolean array marking Pareto-efficient points.
     """
     is_efficient = np.ones(costs.shape[0], dtype=bool)
     for i, c in enumerate(costs):
         if is_efficient[i]:
-            # Remove dominated points: if any cost in remaining points is lower than c,
-            # then that point cannot be dominated by c.
             is_efficient[is_efficient] = np.any(costs[is_efficient] < c, axis=1)
-            is_efficient[i] = True  # Keep self
+            is_efficient[i] = True  # Always keep self
     return is_efficient
 
-# Compute Pareto efficient (non-dominated) points
+# Compute Pareto-efficient (non-dominated) points
 mask = is_pareto_efficient(points)
 pareto_points = points[mask]
 
@@ -67,8 +63,8 @@ Z = Z.reshape(xx.shape)
 
 # Plot decision boundary and data points
 fig2, ax2 = plt.subplots()
-contour = ax2.contourf(xx, yy, Z, alpha=0.8, cmap='coolwarm')
-scatter = ax2.scatter(X[:, 0], X[:, 1], c=y, edgecolors='k')
+ax2.contourf(xx, yy, Z, alpha=0.8, cmap='coolwarm')
+ax2.scatter(X[:, 0], X[:, 1], c=y, edgecolors='k')
 ax2.set_title("SVM Decision Boundary")
 ax2.set_xlabel("Feature 1")
 ax2.set_ylabel("Feature 2")
