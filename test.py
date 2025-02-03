@@ -47,7 +47,7 @@ ax.set_ylabel("Objective 2")
 
 # Add a legend and title to the plot.
 ax.legend()
-ax.set_title("Convex Pareto Front with Weighted Preference")
+ax.set_title("Multi-Criteria Decision-Making")
 
 # --- Display the plot and the optimal solution ---
 
