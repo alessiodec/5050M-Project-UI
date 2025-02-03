@@ -24,7 +24,6 @@ def is_pareto_efficient(costs):
     is_efficient = np.ones(costs.shape[0], dtype=bool)
     for i, c in enumerate(costs):
         if is_efficient[i]:
-            # For all points still marked as efficient, check if any objective is strictly lower than that of c.
             is_efficient[is_efficient] = np.any(costs[is_efficient] < c, axis=1)
             is_efficient[i] = True  # Keep self as efficient.
     return is_efficient
@@ -51,10 +50,11 @@ ax.set_ylabel("Objective 2")
 ax.set_title("Pareto Front with Weighted Sum Selection")
 ax.legend()
 
-# Annotate the best point with its weighted score.
-ax.annotate(f"Opt Score: {weighted_scores[best_index]:.2f}",
-            xy=(best_point[0], best_point[1]),
-            xytext=(best_point[0] + 0.05, best_point[1] + 0.05),
-            arrowprops=dict(facecolor='black', shrink=0.05))
+# Add a text box (without arrow) indicating the optimal score.
+ax.text(0.05, 0.95, f"Optimal Score: {weighted_scores[best_index]:.2f}",
+        transform=ax.transAxes,
+        fontsize=12,
+        verticalalignment='top',
+        bbox=dict(facecolor='white', alpha=0.5, edgecolor='black'))
 
 st.pyplot(fig)
