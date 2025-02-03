@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 st.title("Pareto Front Selection via Weighted Sum")
 
 # Sidebar: Preference slider
-# When the slider is at 0, full weight is on Objective 2; at 1, full weight is on Objective 1.
+# At 0.0, full weight is on Objective 2; at 1.0, full weight is on Objective 1.
 weight = st.sidebar.slider("Preference Weight for Objective 1", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
 w1 = weight
 w2 = 1 - weight
@@ -25,7 +25,7 @@ def is_pareto_efficient(costs):
     for i, c in enumerate(costs):
         if is_efficient[i]:
             is_efficient[is_efficient] = np.any(costs[is_efficient] < c, axis=1)
-            is_efficient[i] = True  # Keep self as efficient.
+            is_efficient[i] = True  # Always keep self.
     return is_efficient
 
 # Compute the Pareto front (non-dominated set) among all points.
@@ -39,7 +39,7 @@ weighted_scores = w1 * pareto_points[:, 0] + w2 * pareto_points[:, 1]
 best_index = np.argmin(weighted_scores)
 best_point = pareto_points[best_index]
 
-# Plot only the Pareto front points and highlight the selected optimal point.
+# Plot the Pareto front points and highlight the selected optimal point.
 fig, ax = plt.subplots()
 ax.scatter(pareto_points[:, 0], pareto_points[:, 1], label='Pareto Front Points', alpha=0.7)
 ax.scatter(best_point[0], best_point[1], color='red', label='Selected Optimal', s=100)
@@ -48,13 +48,12 @@ ax.set_ylabel("Objective 2")
 ax.set_title("Pareto Front with Weighted Sum Selection")
 ax.legend()
 
-# Adjust the figure to create space on the right side for the text box.
+# Adjust the figure to create space on the right for the text box.
 plt.subplots_adjust(right=0.75)
 
-# Add a text box outside the plot on the right side to display the optimal score.
+# Place a text box outside the plot (to the right) displaying the optimal score.
 fig.text(0.78, 0.5, f"Optimal Score:\n{weighted_scores[best_index]:.2f}",
          fontsize=12,
          bbox=dict(facecolor='white', alpha=0.5, edgecolor='black'))
 
 st.pyplot(fig)
-
