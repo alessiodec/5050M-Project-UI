@@ -2,70 +2,57 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Fix the random seed so that the underlying points (and thus the Pareto front) remain constant.
-np.random.seed(42)
+# --- Generate the Pareto front ---
 
-st.title("Pareto Front with Weighted Sum Optimal Selection")
+# f1: First objective values, 100 evenly spaced points between 0 and 1.
+f1 = np.linspace(0, 1, 100)
 
-# Sidebar slider for preference weight.
-# At 0.0, full weight is on Objective 2; at 1.0, full weight is on Objective 1.
-weight = st.sidebar.slider(
-    "Preference Weight for Objective 1", min_value=0.0, max_value=1.0, value=0.5, step=0.01
-)
-w1 = weight
-w2 = 1 - weight
-st.sidebar.write(f"Objective 1 Weight: {w1:.2f} | Objective 2 Weight: {w2:.2f}")
+# f2: Second objective values defined as a convex function of f1.
+# Here, we use f2 = 1 - sqrt(f1) so that when f1=0, f2=1 and when f1=1, f2=0.
+# This gives a convex trade-off curve.
+f2 = 1 - np.sqrt(f1)
 
-# Generate random points representing two objectives (both assumed to be minimized).
-num_points = 200
-points = np.random.rand(num_points, 2)
+# --- Create a slider for weighting the objectives ---
 
-# Function to compute Pareto-efficient (non-dominated) points.
-def is_pareto_efficient(costs):
-    """
-    Returns a boolean array indicating whether each point in `costs` is Pareto efficient.
-    For minimization, a point is Pareto efficient if no other point is lower in *both* objectives.
-    """
-    is_efficient = np.ones(costs.shape[0], dtype=bool)
-    for i, c in enumerate(costs):
-        if is_efficient[i]:
-            # For all points still marked as efficient, mark as efficient only if at least one objective is lower than c.
-            is_efficient[is_efficient] = np.any(costs[is_efficient] < c, axis=1)
-            is_efficient[i] = True  # Always keep the current point.
-    return is_efficient
+# The slider returns a value w between 0 and 1.
+# w = 1 means full preference for f1 (first objective),
+# while w = 0 means full preference for f2 (second objective).
+w = st.slider("Preference weight (0: prefer f2, 1: prefer f1)", 0.0, 1.0, 0.5)
 
-# Compute the Pareto front (non-dominated set) from the random points.
-pareto_mask = is_pareto_efficient(points)
-pareto_points = points[pareto_mask]
+# --- Compute the weighted sum for each point on the Pareto front ---
 
-# Compute the weighted score for each Pareto point.
-# A lower weighted sum is considered better.
-weighted_scores = w1 * pareto_points[:, 0] + w2 * pareto_points[:, 1]
+# The weighted sum objective is: weighted_value = w * f1 + (1 - w) * f2.
+# Lower values are better (assuming a minimization problem).
+weighted_objectives = w * f1 + (1 - w) * f2
 
-# Identify the Pareto point with the minimum weighted score.
-best_index = np.argmin(weighted_scores)
-best_point = pareto_points[best_index]
+# Find the index of the point with the minimum weighted sum.
+optimal_index = np.argmin(weighted_objectives)
+optimal_f1 = f1[optimal_index]
+optimal_f2 = f2[optimal_index]
 
-# Create the plot.
+# --- Plot the Pareto front and highlight the optimal solution ---
+
+# Create a matplotlib figure and axis.
 fig, ax = plt.subplots()
 
-# Plot only the Pareto front points (blue dots).
-ax.scatter(pareto_points[:, 0], pareto_points[:, 1], color='blue', label='Pareto Front', s=50)
+# Plot all the Pareto front points in blue with a line connecting them.
+ax.plot(f1, f2, "bo-", label="Pareto Front")
 
-# Highlight the selected optimal Pareto point (red dot).
-ax.scatter(best_point[0], best_point[1], color='red', label='Optimal Solution', s=100)
+# Highlight the optimal solution (lowest weighted sum) with a red marker.
+ax.plot(optimal_f1, optimal_f2, "ro", markersize=10, label="Optimal Solution")
 
+# Label the axes.
 ax.set_xlabel("Objective 1")
 ax.set_ylabel("Objective 2")
-ax.set_title("Pareto Front with Optimal Selection by Weighted Sum")
+
+# Add a legend and title to the plot.
 ax.legend()
+ax.set_title("Convex Pareto Front with Weighted Preference")
 
-# Adjust the figure to create space on the right for the text box.
-plt.subplots_adjust(right=0.75)
+# --- Display the plot and the optimal solution ---
 
-# Place a text box outside the plot (to the right) displaying the optimal weighted score.
-fig.text(0.78, 0.5, f"Optimal Score:\n{weighted_scores[best_index]:.2f}",
-         fontsize=12,
-         bbox=dict(facecolor='white', alpha=0.5, edgecolor='black'))
-
+# Use Streamlit to show the matplotlib figure.
 st.pyplot(fig)
+
+# Display a text box below the plot showing the optimal solution's objective values.
+st.text(f"Optimal solution: f1 = {optimal_f1:.3f}, f2 = {optimal_f2:.3f}")
