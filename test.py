@@ -33,7 +33,6 @@ pareto_mask = is_pareto_efficient(points)
 pareto_points = points[pareto_mask]
 
 # For the Pareto front points, compute the weighted sum.
-# A lower weighted sum is considered better.
 weighted_scores = w1 * pareto_points[:, 0] + w2 * pareto_points[:, 1]
 
 # Identify the Pareto front point with the minimum weighted score.
@@ -44,17 +43,18 @@ best_point = pareto_points[best_index]
 fig, ax = plt.subplots()
 ax.scatter(pareto_points[:, 0], pareto_points[:, 1], label='Pareto Front Points', alpha=0.7)
 ax.scatter(best_point[0], best_point[1], color='red', label='Selected Optimal', s=100)
-
 ax.set_xlabel("Objective 1")
 ax.set_ylabel("Objective 2")
 ax.set_title("Pareto Front with Weighted Sum Selection")
 ax.legend()
 
-# Add a text box (without arrow) indicating the optimal score.
-ax.text(0.05, 0.95, f"Optimal Score: {weighted_scores[best_index]:.2f}",
-        transform=ax.transAxes,
-        fontsize=12,
-        verticalalignment='top',
-        bbox=dict(facecolor='white', alpha=0.5, edgecolor='black'))
+# Adjust the figure to create space on the right side for the text box.
+plt.subplots_adjust(right=0.75)
+
+# Add a text box outside the plot on the right side to display the optimal score.
+fig.text(0.78, 0.5, f"Optimal Score:\n{weighted_scores[best_index]:.2f}",
+         fontsize=12,
+         bbox=dict(facecolor='white', alpha=0.5, edgecolor='black'))
 
 st.pyplot(fig)
+
