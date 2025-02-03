@@ -2,12 +2,17 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Fix the random seed so that the Pareto front remains constant.
+np.random.seed(42)
+
 # App Title
 st.title("Pareto Front Selection via Weighted Sum")
 
 # Sidebar: Preference slider
-# At 0.0, full weight is on Objective 2; at 1.0, full weight is on Objective 1.
-weight = st.sidebar.slider("Preference Weight for Objective 1", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
+# When the slider is at 0, full weight is on Objective 2;
+# at 1, full weight is on Objective 1.
+weight = st.sidebar.slider("Preference Weight for Objective 1", 
+                           min_value=0.0, max_value=1.0, value=0.5, step=0.01)
 w1 = weight
 w2 = 1 - weight
 st.sidebar.write(f"Objective 1 Weight: {w1:.2f} | Objective 2 Weight: {w2:.2f}")
@@ -32,20 +37,35 @@ def is_pareto_efficient(costs):
 pareto_mask = is_pareto_efficient(points)
 pareto_points = points[pareto_mask]
 
-# For the Pareto front points, compute the weighted sum.
+# For visualization, sort the Pareto front points by Objective 1
+sort_idx = np.argsort(pareto_points[:, 0])
+sorted_pareto = pareto_points[sort_idx]
+
+# Compute weighted sums for each Pareto point.
+# (A lower weighted sum is considered better.)
 weighted_scores = w1 * pareto_points[:, 0] + w2 * pareto_points[:, 1]
 
 # Identify the Pareto front point with the minimum weighted score.
 best_index = np.argmin(weighted_scores)
 best_point = pareto_points[best_index]
 
-# Plot the Pareto front points and highlight the selected optimal point.
+# Create the figure and axis.
 fig, ax = plt.subplots()
-ax.scatter(pareto_points[:, 0], pareto_points[:, 1], label='Pareto Front Points', alpha=0.7)
+
+# Plot all points in light gray.
+ax.scatter(points[:, 0], points[:, 1], color='gray', alpha=0.3, label='All Points')
+
+# Plot the Pareto front points in blue.
+ax.scatter(pareto_points[:, 0], pareto_points[:, 1], color='blue', label='Pareto Front', s=50)
+# Connect the Pareto front points with a line.
+ax.plot(sorted_pareto[:, 0], sorted_pareto[:, 1], color='blue', linewidth=1)
+
+# Highlight the optimal Pareto front point based on weighted sum.
 ax.scatter(best_point[0], best_point[1], color='red', label='Selected Optimal', s=100)
+
 ax.set_xlabel("Objective 1")
 ax.set_ylabel("Objective 2")
-ax.set_title("Pareto Front with Weighted Sum Selection")
+ax.set_title("Pareto Front (Static) with Optimal Point by Weighted Sum")
 ax.legend()
 
 # Adjust the figure to create space on the right for the text box.
