@@ -21,6 +21,23 @@ def show_page1():
     """Display content for Page 1."""
     st.title("Page 1")
     st.write("Welcome to Page 1!")
+
+    # reading dataset
+
+    import pandas as pd
+    
+    # The file ID from your Google Drive share link
+    file_id = "10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
+    
+    # Construct the direct download URL
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    
+    # Use pandas to read the CSV file from the URL
+    df = pd.read_csv(url)
+    
+    # Display the first few rows of the DataFrame
+    print(df.head())
+    
     if st.button("Back to Home"):
         st.session_state.page = 'home'
 
