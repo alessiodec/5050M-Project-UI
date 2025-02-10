@@ -8,7 +8,7 @@ def show_home():
     """Display the main menu with buttons for each page."""
     st.title("Main Menu")
     st.write("Choose a page:")
-    if st.button("Page 1"):
+    if st.button("Input / Output Relationship Analysis"):
         st.session_state.page = 'page1'
     if st.button("Page 2"):
         st.session_state.page = 'page2'
