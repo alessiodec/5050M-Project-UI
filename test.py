@@ -20,7 +20,8 @@ def load_model():
             return
     
     try:
-        model = tf.keras.models.load_model(model_path)
+        custom_objects = {"mse": tf.keras.losses.MeanSquaredError()}
+        model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
         st.success("Model loaded successfully!")
     except Exception as e:
         st.error(f"Error loading trained model: {e}")
