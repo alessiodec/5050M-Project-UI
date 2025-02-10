@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import tensorflow as tf
+import urllib.request
+import os
 
 # Initialize the page state if it doesn't exist.
 if 'page' not in st.session_state:
@@ -64,11 +66,22 @@ def show_page2():
     # Split into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled, test_size=0.2, random_state=42)
     
-    # Load trained model from GitHub repo
+    # Download model from GitHub raw URL
+    model_url = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/alessio_test_1.h5"
+    model_path = "alessio_test_1.h5"
+    
+    if not os.path.exists(model_path):
+        try:
+            urllib.request.urlretrieve(model_url, model_path)
+        except Exception as e:
+            st.error(f"Error downloading trained model: {e}")
+            return
+    
+    # Load trained model
     try:
-        model = tf.keras.models.load_model("alessio_test_1.h5")  # Ensure you have alessio_test_1.h5 in the repo
+        model = tf.keras.models.load_model(model_path)
     except Exception as e:
-        st.error("Error loading trained model.")
+        st.error(f"Error loading trained model: {e}")
         return
     
     # Generate Contour Plots
