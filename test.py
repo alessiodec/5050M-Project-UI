@@ -1,58 +1,58 @@
 import streamlit as st
-import numpy as np
-import matplotlib.pyplot as plt
 
-# --- Generate the Pareto front ---
+# Initialize the page state if it doesn't exist.
+if 'page' not in st.session_state:
+    st.session_state.page = 'home'
 
-# f1: First objective values, 100 evenly spaced points between 0 and 1.
-f1 = np.linspace(0, 1, 100)
+def show_home():
+    """Display the main menu with buttons for each page."""
+    st.title("Main Menu")
+    st.write("Choose a page:")
+    if st.button("Page 1"):
+        st.session_state.page = 'page1'
+    if st.button("Page 2"):
+        st.session_state.page = 'page2'
+    if st.button("Page 3"):
+        st.session_state.page = 'page3'
+    if st.button("Page 4"):
+        st.session_state.page = 'page4'
 
-# f2: Second objective values defined as a convex function of f1.
-# Here, we use f2 = 1 - sqrt(f1) so that when f1=0, f2=1 and when f1=1, f2=0.
-# This gives a convex trade-off curve.
-f2 = 1 - np.sqrt(f1)
+def show_page1():
+    """Display content for Page 1."""
+    st.title("Page 1")
+    st.write("Welcome to Page 1!")
+    if st.button("Back to Home"):
+        st.session_state.page = 'home'
 
-# --- Create a slider for weighting the objectives ---
+def show_page2():
+    """Display content for Page 2."""
+    st.title("Page 2")
+    st.write("Welcome to Page 2!")
+    if st.button("Back to Home"):
+        st.session_state.page = 'home'
 
-# The slider returns a value w between 0 and 1.
-# w = 1 means full preference for f1 (first objective),
-# while w = 0 means full preference for f2 (second objective).
-w = st.slider("Preference weight (0: prefer f2, 1: prefer f1)", 0.0, 1.0, 0.5)
+def show_page3():
+    """Display content for Page 3."""
+    st.title("Page 3")
+    st.write("Welcome to Page 3!")
+    if st.button("Back to Home"):
+        st.session_state.page = 'home'
 
-# --- Compute the weighted sum for each point on the Pareto front ---
+def show_page4():
+    """Display content for Page 4."""
+    st.title("Page 4")
+    st.write("Welcome to Page 4!")
+    if st.button("Back to Home"):
+        st.session_state.page = 'home'
 
-# The weighted sum objective is: weighted_value = w * f1 + (1 - w) * f2.
-# Lower values are better (assuming a minimization problem).
-weighted_objectives = w * f1 + (1 - w) * f2
-
-# Find the index of the point with the minimum weighted sum.
-optimal_index = np.argmin(weighted_objectives)
-optimal_f1 = f1[optimal_index]
-optimal_f2 = f2[optimal_index]
-
-# --- Plot the Pareto front and highlight the optimal solution ---
-
-# Create a matplotlib figure and axis.
-fig, ax = plt.subplots()
-
-# Plot all the Pareto front points in blue with a line connecting them.
-ax.plot(f1, f2, "bo-", label="Pareto Front")
-
-# Highlight the optimal solution (lowest weighted sum) with a red marker.
-ax.plot(optimal_f1, optimal_f2, "ro", markersize=10, label="Optimal Solution")
-
-# Label the axes.
-ax.set_xlabel("Objective 1")
-ax.set_ylabel("Objective 2")
-
-# Add a legend and title to the plot.
-ax.legend()
-ax.set_title("Multi-Criteria Decision-Making")
-
-# --- Display the plot and the optimal solution ---
-
-# Use Streamlit to show the matplotlib figure.
-st.pyplot(fig)
-
-# Display a text box below the plot showing the optimal solution's objective values.
-st.text(f"Optimal solution: f1 = {optimal_f1:.3f}, f2 = {optimal_f2:.3f}")
+# Render the appropriate page based on the current state.
+if st.session_state.page == 'home':
+    show_home()
+elif st.session_state.page == 'page1':
+    show_page1()
+elif st.session_state.page == 'page2':
+    show_page2()
+elif st.session_state.page == 'page3':
+    show_page3()
+elif st.session_state.page == 'page4':
+    show_page4()
