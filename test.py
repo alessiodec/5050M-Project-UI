@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 # Initialize the page state if it doesn't exist.
 if 'page' not in st.session_state:
@@ -21,30 +22,26 @@ def show_page1():
     """Display content for Page 1."""
     st.title("Page 1")
     st.write("Welcome to Page 1!")
-
-    # reading dataset
-
-    import pandas as pd
-    
-    # The file ID from your Google Drive share link
-    file_id = "10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
-    
-    # Construct the direct download URL
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    
-    # Use pandas to read the CSV file from the URL
-    df = pd.read_csv(url)
-    
-    # Display the first few rows of the DataFrame
-    print(df.head())
-    
     if st.button("Back to Home"):
         st.session_state.page = 'home'
 
 def show_page2():
-    """Display content for Page 2."""
+    """Display content for Page 2 and print the DataFrame head."""
     st.title("Page 2")
     st.write("Welcome to Page 2!")
+    
+    # Define the Google Drive file ID and build the direct download URL.
+    file_id = "10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    
+    # Read the CSV file into a DataFrame.
+    try:
+        df = pd.read_csv(url)
+        st.write("DataFrame Head:")
+        st.write(df.head())
+    except Exception as e:
+        st.error(f"Error loading CSV file: {e}")
+    
     if st.button("Back to Home"):
         st.session_state.page = 'home'
 
