@@ -13,6 +13,10 @@ st.title("Corrosion Contour Plots")
 model_url = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/alessio_test_1.h5"
 model_path = "alessio_test_1.h5"
 
+# Initialize session state for model
+if 'model' not in st.session_state:
+    st.session_state.model = None
+
 # Function to download and load the model
 def load_model():
     if not os.path.exists(model_path):
@@ -25,15 +29,17 @@ def load_model():
     
     try:
         custom_objects = {"mse": tf.keras.losses.MeanSquaredError()}
-        model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
+        st.session_state.model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
         st.success("Model loaded successfully!")
-        return model
     except Exception as e:
         st.error(f"Error loading trained model: {e}")
-        return None
 
 # Function to generate contour plots
-def plot_contours(model):
+def plot_contours():
+    if st.session_state.model is None:
+        st.error("Please load the model first!")
+        return
+    
     # Load dataset from Google Drive
     file_id = "10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
     url = f"https://drive.google.com/uc?export=download&id={file_id}"
@@ -85,7 +91,7 @@ def plot_contours(model):
             grid_points[:, i] = grid_y.ravel()
             
             grid_points_scaled = scaler_X.transform(grid_points)
-            predictions_scaled = model.predict(grid_points_scaled)
+            predictions_scaled = st.session_state.model.predict(grid_points_scaled)
             predictions = scaler_y.inverse_transform(predictions_scaled)
             corrosion_rate = predictions[:, 0].reshape(grid_x.shape)
             
@@ -102,8 +108,9 @@ def plot_contours(model):
     
     st.pyplot(fig)
 
-# Button to trigger model loading and plotting
-if st.button("Load Model and Generate Contour Plots"):
-    model = load_model()
-    if model:
-        plot_contours(model)
+# Buttons to trigger model loading and plotting
+if st.button("Load Model"):
+    load_model()
+
+if st.button("Generate Contour Plots"):
+    plot_contours()
