@@ -1,5 +1,6 @@
 import streamlit as st
-from load_data_model import load_and_preprocess_data, load_trained_model
+from load_data import load_and_preprocess_data
+from load_model import load_trained_model
 from plot_contours import plot_corrosion_contours
 from plot_saturation_ratio import plot_saturation_ratio_contours
 
