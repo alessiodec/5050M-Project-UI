@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_corrosion_contours(model, X, scaler_X, scaler_y):
+def plot_corrosion_rate_contours(model, X, scaler_X, scaler_y):
     """Generates and returns corrosion contour plots."""
     if model is None:
         return None, "Model is not loaded!"
