@@ -64,9 +64,9 @@ def show_page2():
     # Split into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled, test_size=0.2, random_state=42)
     
-    # Load trained model
+    # Load trained model from GitHub repo
     try:
-        model = tf.keras.models.load_model("model.h5")  # Ensure you have model.h5 in the correct location
+        model = tf.keras.models.load_model("alessio_test_1.h5")  # Ensure you have alessio_test_1.h5 in the repo
     except Exception as e:
         st.error("Error loading trained model.")
         return
