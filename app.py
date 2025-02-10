@@ -45,7 +45,7 @@ def contour_plots():
     if st.button("Generate Corrosion Rate Contour Plots"):
         if st.session_state.data and st.session_state.model:
             X, X_scaled, y, y_scaled, scaler_X, scaler_y = st.session_state.data
-            fig, error = plot_corrosion_contours(st.session_state.model, X, scaler_X, scaler_y)
+            fig, error = plot_corrosion_rate_contours(st.session_state.model, X, scaler_X, scaler_y)
             if error:
                 st.error(error)
             else:
