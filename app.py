@@ -1,7 +1,7 @@
 import streamlit as st
 from functions.load_models import load_models  # Import the load_models function
 from functions.load_preprocess_data import load_preprocess_data  # Import the load_preprocess_data function
-from functions import 5x5_cr, 5x5_sr  # Import the contour plot functions
+from functions import plot_5x5_cr, plot_5x5_sr  # Import the contour plot functions
 
 # Call the functions to load models and preprocess data
 cr_model, sr_model = load_models()
@@ -31,13 +31,13 @@ def data_analysis():
         cr_button = st.button('Corrosion Rate')
         if cr_button:
             st.write("Generating Corrosion Rate Contour Plot...")
-            5x5_cr(cr_model, X_train, scaler_X)  # Call the 5x5_cr function to display the plot
+            plot_5x5_cr(cr_model, X_train, scaler_X)  # Call the 5x5_cr function to display the plot
 
         # Button for Saturation Ratio contour plot
         sr_button = st.button('Saturation Ratio')
         if sr_button:
             st.write("Generating Saturation Ratio Contour Plot...")
-            5x5_sr(sr_model, X_train, scaler_X)  # Call the 5x5_sr function to display the plot
+            plot_5x5_sr(sr_model, X_train, scaler_X)  # Call the 5x5_sr function to display the plot
 
 def optimisation():
     st.title('Optimisation')
