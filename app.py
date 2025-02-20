@@ -6,7 +6,7 @@ from functions.plot_5x5_sr import plot_5x5_sr  # Import the correct function for
 
 # Call the functions to load models and preprocess data
 cr_model, sr_model = load_models()
-X_train, X_test, y_train, y_test, scaler_X, scaler_y = load_preprocess_data()
+X, X_train, X_test, y_train, y_test, scaler_X, scaler_y = load_preprocess_data()
 
 # Main app content
 st.title("Main Dashboard")
