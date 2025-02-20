@@ -1,4 +1,20 @@
 import streamlit as st
+from load_models import load_models  # Import the load_models function
+from load_preprocess_data import load_preprocess_data  # Import the load_preprocess_data function
+
+# Call the functions to load models and preprocess data
+cr_model, sr_model = load_models()
+X_train, X_test, y_train, y_test, scaler_X, scaler_y = load_preprocess_data()
+
+# Main app content
+st.title("Main Dashboard")
+
+# Display the loaded models and data summary
+st.write("Corrosion Rate Model and Saturation Rate Model are loaded successfully.")
+st.write(f"Training data shape: {X_train.shape}, {y_train.shape}")
+st.write(f"Test data shape: {X_test.shape}, {y_test.shape}")
+
+# You can now proceed to add your app's functionality here (e.g., buttons, visualizations, etc.)
 
 # Define functions for each section
 def data_analysis():
