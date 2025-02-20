@@ -7,11 +7,6 @@ from functions.plot_5x5_sr import plot_5x5_sr  # Import the correct function for
 # Main app content
 st.title("Main Dashboard")
 
-# Display the loaded models and data summary
-st.write("Corrosion Rate Model and Saturation Rate Model are loaded successfully.")
-st.write(f"Training data shape: {X_train.shape}, {y_train.shape}")
-st.write(f"Test data shape: {X_test.shape}, {y_test.shape}")
-
 # Define functions for each section
 def data_analysis():
     st.title('Data Analysis')
