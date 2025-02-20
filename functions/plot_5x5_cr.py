@@ -1,13 +1,13 @@
 def plot_5x5_cr(cr_model, X, scaler_X):
+    mid_points = np.median(X, axis=0)  # Calculate the median of X across columns
+    # Continue with the rest of your logic
+
     """
     Generate a 5x5 grid of plots showing the Corrosion Rate (CR) predictions
     for different input combinations.
     """
     # List of input names
     var_names = ['pH', 'T (C)', 'log10 PCO2 (bar)', 'log10 v (ms-1)', 'log10 d ']
-    
-    # Calculate median for each input (baseline)
-    mid_points = np.median(X, axis=0)  # 1D array with 5 median values
     
     # Get lower and upper bounds for each input to define grid ranges
     mins = X.min(axis=0)
