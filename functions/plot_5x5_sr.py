@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import streamlit as st  # Import streamlit for rendering the plot
 
 def plot_5x5_sr(sr_model, X, scaler_X):
     """
@@ -36,8 +37,8 @@ def plot_5x5_sr(sr_model, X, scaler_X):
             # On the diagonal, display the variable name only
             if i == j:
                 ax.text(0.5, 0.5, var_names[i], fontsize=14, ha='center', va='center')
-                ax.set_xticks([])
-                ax.set_yticks([])
+                ax.set_xticks([])  # Remove x ticks
+                ax.set_yticks([])  # Remove y ticks
                 continue
             
             # Generate 25 evenly spaced points for the current two variables
@@ -75,5 +76,8 @@ def plot_5x5_sr(sr_model, X, scaler_X):
     cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])
     fig.colorbar(cont_fill, cax=cbar_ax, label='Scaled Saturation Ratio')
     
+    # Set a title for the entire plot
     plt.suptitle('SR For Different Input Combinations', fontsize=18)
-    plt.show()
+    
+    # Render the plot in Streamlit
+    st.pyplot(fig)  # This will render the plot in Streamlit
