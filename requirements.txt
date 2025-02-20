@@ -1,9 +1,9 @@
-numpy==1.26.4
+numpy
 matplotlib
 streamlit
 scikit-learn
 pandas
 tensorflow
-catboost==1.2.7
+catboost
 gdown
 seaborn
