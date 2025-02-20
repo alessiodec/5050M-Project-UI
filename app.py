@@ -11,9 +11,7 @@ X_train, X_test, y_train, y_test, scaler_X, scaler_y = load_preprocess_data()
 st.title("Main Dashboard")
 
 # Display the loaded models and data summary
-st.write("Corrosion Rate Model and Saturation Rate Model are loaded successfully.")
-st.write(f"Training data shape: {X_train.shape}, {y_train.shape}")
-st.write(f"Test data shape: {X_test.shape}, {y_test.shape}")
+st.write("Data and Models Loaded and Preprocessed Successfully.")
 
 # Define functions for each section
 def data_analysis():
