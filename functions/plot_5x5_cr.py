@@ -1,21 +1,8 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import streamlit as st  # Import streamlit for rendering the plot
-
 def plot_5x5_cr(cr_model, X, scaler_X):
     """
     Generate a 5x5 grid of plots showing the Corrosion Rate (CR) predictions
     for different input combinations.
-    
-    Parameters:
-    - cr_model: The trained corrosion rate model.
-    - X: The feature data used for predictions (scaled).
-    - scaler_X: The StandardScaler used to scale the features.
-    
-    Outputs:
-    - A 5x5 grid of contour plots displaying the predicted corrosion rates.
     """
-    
     # List of input names
     var_names = ['pH', 'T (C)', 'log10 PCO2 (bar)', 'log10 v (ms-1)', 'log10 d ']
     
