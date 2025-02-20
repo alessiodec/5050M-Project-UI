@@ -4,10 +4,6 @@ from functions.load_preprocess_data import load_preprocess_data  # Import the lo
 from functions.plot_5x5_cr import plot_5x5_cr  # Import the correct function for corrosion rate
 from functions.plot_5x5_sr import plot_5x5_sr  # Import the correct function for saturation ratio
 
-# Call the functions to load models and preprocess data
-cr_model, sr_model = load_models()
-X, X_train, X_test, y_train, y_test, scaler_X, scaler_y = load_preprocess_data()
-
 # Main app content
 st.title("Main Dashboard")
 
@@ -36,6 +32,8 @@ def contour_plots():
     cr_button = st.button('Corrosion Rate')
     if cr_button:
         st.write("Generating Corrosion Rate Contour Plot...")
+        cr_model, sr_model = load_models()
+        X, X_train, X_test, y_train, y_test, scaler_X, scaler_y = load_preprocess_data()
         plot_5x5_cr(cr_model, X_train, scaler_X)  # Call the plot_5x5_cr function to display the plot
 
     # Button for Saturation Ratio contour plot
