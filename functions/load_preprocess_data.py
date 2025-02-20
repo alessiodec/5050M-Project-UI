@@ -32,4 +32,4 @@ def load_preprocess_data():
     # Split scaled features and targets into training and testing subsets
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled, test_size=0.2, random_state=42)
 
-    return X_train, X_test, y_train, y_test, scaler_X, scaler_y
+    return X, X_train, X_test, y_train, y_test, scaler_X, scaler_y
