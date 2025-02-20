@@ -1,8 +1,8 @@
 import streamlit as st
 from functions.load_models import load_models  # Import the load_models function
 from functions.load_preprocess_data import load_preprocess_data  # Import the load_preprocess_data function
-from functions.plot_cr_5x5 import plot_cr_5x5 # Import the renamed contour plot functions
-from functions.plot_sr_5x5 import plot_sr_5x5  # Import the renamed contour plot functions
+from functions.plot_5x5_cr import plot_5x5_cr # Import the renamed contour plot functions
+from functions.plot_5x5_sr import plot_5x5_sr  # Import the renamed contour plot functions
 
 # Call the functions to load models and preprocess data
 cr_model, sr_model = load_models()
