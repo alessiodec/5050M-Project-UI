@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def 5x5_sr(sr_model, X, scaler_X):
+def plot_5x5_sr(sr_model, X, scaler_X):
     """
     Generate a 5x5 grid of plots showing the Saturation Ratio (SR) predictions
     for different input combinations.
