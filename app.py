@@ -1,6 +1,6 @@
 import streamlit as st
-from load_models import load_models  # Import the load_models function
-from load_preprocess_data import load_preprocess_data  # Import the load_preprocess_data function
+from functions.load_models import load_models  # Import the load_models function
+from functions.load_preprocess_data import load_preprocess_data  # Import the load_preprocess_data function
 
 # Call the functions to load models and preprocess data
 cr_model, sr_model = load_models()
