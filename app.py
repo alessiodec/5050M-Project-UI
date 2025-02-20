@@ -35,7 +35,7 @@ def contour_plots():
     sr_button = st.button('Saturation Ratio')
     if sr_button:
         st.write("Generating Saturation Ratio Contour Plot...")
-        plot_5x5_sr(sr_model, X_train, scaler_X)  # Call the plot_5x5_sr function to display the plot
+        plot_5x5_sr(sr_model, X, scaler_X)  # Call the plot_5x5_sr function to display the plot
 
 def optimisation():
     st.title('Optimisation')
