@@ -104,7 +104,7 @@ def statistical_analysis():
     descriptive_stats_button = st.button('Descriptive Statistics')
     if descriptive_stats_button:
         st.write("Generating Statistical Description...")
-        descriptive_analysis(X)  # Call the descriptive analysis function with X and column names
+        descriptive_analysis(X)  # Call the descriptive analysis function with X
 
     input_histograms_button = st.button('Input Histograms')
     if input_histograms_button:
@@ -116,14 +116,8 @@ def statistical_analysis():
     if home_button:
         st.session_state.page = 'main'  # Navigate back to the main page
 
+################################### MAIN APP ###################################
 
-################################### OPTIMISATION PAGE ###################################
-
-
-################################### PHYSICAL RELATIONSHIP ANALYSIS PAGE ###################################
-
-
-# Main page content
 def main():
     if 'page' not in st.session_state:
         st.session_state.page = 'main'  # Set default page to 'main'
