@@ -110,7 +110,7 @@ def statistical_analysis():
     if input_histograms_button:
         st.write("Creating Input Histograms...")
         # You can implement the logic for input histograms here later
-        input_histogram(df_subset)
+        input_histogram()
 
     # Home button
     home_button = st.button("Go to Home")
