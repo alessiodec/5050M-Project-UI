@@ -1,4 +1,4 @@
-def plot_5x5_cr(cr_model, X, scaler_X):
+def plot_5x5_cr(X, scaler_X, cr_model):
     mid_points = np.median(X, axis=0)  # Calculate the median of X across columns
     
     # List of input names
