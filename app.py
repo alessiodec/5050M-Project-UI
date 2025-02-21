@@ -57,6 +57,14 @@ def statistical_analysis():
     st.title('Statistical Analysis')
     st.write("This section will contain the statistical analysis logic.")
 
+    # Access the data
+    if 'data' not in st.session_state or 'df_subset' not in st.session_state:
+        st.write("Data not found. Please load the data first.")
+        return
+
+    X, scaler_X = st.session_state.data
+    df_subset = st.session_state.df_subset  # Access df_subset from session state
+
     # Button for PCA analysis
     pca_analysis_button = st.button('PCA Analysis')
     if pca_analysis_button:
@@ -110,6 +118,7 @@ def main():
         df_subset, X, scaler_X = load_preprocess_data()
         st.session_state.models = (cr_model, sr_model)
         st.session_state.data = (X, scaler_X)
+        st.session_state.df_subset = df_subset  # Store df_subset in session state
 
     if st.session_state.page == 'main':
         st.title('Main Menu')
