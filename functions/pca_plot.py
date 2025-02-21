@@ -4,6 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+import streamlit as st
 
 def pca_plot():
     # Predefined CSV URL and columns for PCA
@@ -56,7 +57,8 @@ def pca_plot():
     sns.heatmap(loadings_df, cmap='RdBu', center=0, annot=True, fmt='.2f', ax=axes[1])
     axes[1].set_title('PCA Loadings Heatmap')
 
-    plt.show()
+    # Use Streamlit to display the plot
+    st.pyplot(fig)
 
     # Return the explained variance ratios for display or further use
     explained_variance = {}
@@ -65,5 +67,5 @@ def pca_plot():
             'explained_variance_ratio': var,
             'cumulative_variance_ratio': results['cumulative_variance_ratio'][i]
         }
-    
+
     return explained_variance
