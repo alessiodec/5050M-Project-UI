@@ -63,6 +63,17 @@ def statistical_analysis():
         st.write("Performing PCA Analysis...")
         pca_plot()  # Call the PCA plot function
 
+    # Buttons for additional statistical analysis
+    descriptive_stats_button = st.button('Descriptive Statistics')
+    if descriptive_stats_button:
+        st.write("Descriptive Statistics will be displayed here.")
+        # You can implement the logic for descriptive statistics here later
+
+    input_histograms_button = st.button('Input Histograms')
+    if input_histograms_button:
+        st.write("Input Histograms will be displayed here.")
+        # You can implement the logic for input histograms here later
+
     # Home button
     home_button = st.button("Go to Home")
     if home_button:
