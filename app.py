@@ -21,6 +21,11 @@ def data_analysis():
     contour_button = st.button('Contour Plots')
     if contour_button:
         st.session_state.page = 'contour_plots'  # Navigate to the contour plots page
+    
+    # Home button
+    home_button = st.button("Go to Home")
+    if home_button:
+        st.session_state.page = 'main'  # Navigate back to the main page
 
 def contour_plots():
     st.title('Contour Plots')
@@ -41,22 +46,42 @@ def contour_plots():
         st.write("Generating Saturation Ratio Contour Plot...")
         plot_5x5_sr(X, scaler_X, sr_model)  # Call the plot_5x5_sr function to display the plot
 
+    # Home button
+    home_button = st.button("Go to Home")
+    if home_button:
+        st.session_state.page = 'main'  # Navigate back to the main page
+
 def statistical_analysis():
     st.title('Statistical Analysis')
     st.write("This section will contain the statistical analysis logic.")
     
     # You can add more statistical analysis logic here
     st.write("Display your statistical analysis results here.")
+    
+    # Home button
+    home_button = st.button("Go to Home")
+    if home_button:
+        st.session_state.page = 'main'  # Navigate back to the main page
 
 def optimisation():
     st.title('Optimisation')
     st.write("This section will contain your optimisation logic.")
     # Add more content related to optimisation here
 
+    # Home button
+    home_button = st.button("Go to Home")
+    if home_button:
+        st.session_state.page = 'main'  # Navigate back to the main page
+
 def physical_relationship_analysis():
     st.title('Physical Relationship Analysis')
     st.write("This section will contain your physical relationship analysis logic.")
     # Add more content related to physical relationship analysis here
+
+    # Home button
+    home_button = st.button("Go to Home")
+    if home_button:
+        st.session_state.page = 'main'  # Navigate back to the main page
 
 # Main page content
 def main():
