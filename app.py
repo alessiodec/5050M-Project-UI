@@ -61,7 +61,7 @@ def statistical_analysis():
     pca_analysis_button = st.button('PCA Analysis')
     if pca_analysis_button:
         st.write("Performing PCA Analysis...")
-        pca_plot()  # Call the PCA plot function
+        pca_plot(df_subset)  # Call the PCA plot function
 
     # Buttons for additional statistical analysis
     descriptive_stats_button = st.button('Descriptive Statistics')
