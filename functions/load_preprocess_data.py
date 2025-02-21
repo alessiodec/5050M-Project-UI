@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 def load_preprocess_data():
@@ -23,13 +22,5 @@ def load_preprocess_data():
 
     # Create standard scaler instances
     scaler_X = StandardScaler()
-    scaler_y = StandardScaler()
 
-    # Scale the data
-    X_scaled = scaler_X.fit_transform(X)
-    y_scaled = scaler_y.fit_transform(y)
-
-    # Split scaled features and targets into training and testing subsets
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled, test_size=0.2, random_state=42)
-
-    return X, X_train, X_test, y_train, y_test, scaler_X, scaler_y
+    return X, scaler_X
