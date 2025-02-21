@@ -4,7 +4,7 @@ from functions.load_preprocess_data import load_preprocess_data  # Import the lo
 from functions.plot_5x5_cr import plot_5x5_cr  # Import the correct function for corrosion rate
 from functions.plot_5x5_sr import plot_5x5_sr  # Import the correct function for saturation ratio
 from functions.pca_plot import pca_plot  # Import the PCA plot function (you need to create this function)
-from functions.descriptive_analysis import descriptive_analysis
+from functions.descriptive_analysis import descriptive_analysis  # Import the correct function for descriptive analysis
 
 # Main app content
 st.title("Main Dashboard")
@@ -58,7 +58,7 @@ def statistical_analysis():
     st.title('Statistical Analysis')
     st.write("This section will contain the statistical analysis logic.")
 
-    # Access the data
+    # Access the data (X and scaler_X are stored in session state)
     if 'data' not in st.session_state:
         st.write("Data not found. Please load the data first.")
         return
@@ -71,12 +71,11 @@ def statistical_analysis():
         st.write("Performing PCA Analysis...")
         pca_plot()  # Call the PCA plot function
 
-    # Buttons for additional statistical analysis
+    # Button for Descriptive Statistics
     descriptive_stats_button = st.button('Descriptive Statistics')
     if descriptive_stats_button:
-        st.write("Descriptive Statistics will be displayed here.")
-        # You can implement the logic for descriptive statistics here later
-        descriptive_analysis(df_subset)
+        st.write("Descriptive Statistics:")
+        descriptive_analysis(X)  # Pass X directly to descriptive_analysis
 
     input_histograms_button = st.button('Input Histograms')
     if input_histograms_button:
@@ -116,9 +115,9 @@ def main():
     if 'models' not in st.session_state or 'data' not in st.session_state:
         # Automatically load the models and data when the app is opened
         cr_model, sr_model = load_models()
-        df_subset, X, scaler_X = load_preprocess_data()  # load_preprocess_data will no longer return df_subset
+        X, scaler_X = load_preprocess_data()  # load_preprocess_data should return X and scaler_X
         st.session_state.models = (cr_model, sr_model)
-        st.session_state.data = (df_subset, X, scaler_X)
+        st.session_state.data = (X, scaler_X)
 
     if st.session_state.page == 'main':
         st.title('Main Menu')
