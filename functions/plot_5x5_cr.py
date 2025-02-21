@@ -1,8 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
-from tensorflow.keras.models import load_model
+import matplotlib.pyplot as plt
 
 def plot_5x5_cr(X, scaler_X, cr_model):
     mid_points = np.median(X, axis=0)  # Calculate the median of X across columns
