@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-import streamlit as st 
+import streamlit as st
 
 def load_preprocess_data():
     # Import data
