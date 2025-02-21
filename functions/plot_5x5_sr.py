@@ -45,7 +45,7 @@ def plot_5x5_sr(X, scaler_X, sr_model):
             predictions_scaled = sr_model.predict(grid_points_scaled)
             
             # Use predictions directly (no inverse scaling) and extract the second output for SR
-            saturation_ratio = predictions_scaled[:, 1].reshape(grid_x.shape)  # Changed index to 1 for SR
+            saturation_ratio = predictions_scaled[:, 0].reshape(grid_x.shape)  # Changed index to 1 for SR
             
             # Plot filled contour plot on the current subplot using the scaled predictions
             cont_fill = ax.contourf(grid_x, grid_y, saturation_ratio, levels=10, cmap='viridis')
