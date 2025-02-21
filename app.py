@@ -117,7 +117,6 @@ def main():
         X, scaler_X = load_preprocess_data()
         st.session_state.models = (cr_model, sr_model)
         st.session_state.data = (X, scaler_X)
-        st.session_state.df_subset = df_subset  # Store df_subset in session state
 
     if st.session_state.page == 'main':
         st.title('Main Menu')
