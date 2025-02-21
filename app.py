@@ -3,6 +3,7 @@ from functions.load_models import load_models  # Import the load_models function
 from functions.load_preprocess_data import load_preprocess_data  # Import the load_preprocess_data function
 from functions.plot_5x5_cr import plot_5x5_cr  # Import the correct function for corrosion rate
 from functions.plot_5x5_sr import plot_5x5_sr  # Import the correct function for saturation ratio
+from functions.pca_plot import pca_plot  # Import the PCA plot function (you need to create this function)
 
 # Main app content
 st.title("Main Dashboard")
@@ -16,12 +17,22 @@ def data_analysis():
     statistical_analysis_button = st.button('Statistical Analysis')
     if statistical_analysis_button:
         st.session_state.page = 'statistical_analysis'  # Navigate to the statistical analysis page
-    
-    # Create a button for contour plots (if you still need it here)
-    contour_button = st.button('Contour Plots')
-    if contour_button:
-        st.session_state.page = 'contour_plots'  # Navigate to the contour plots page
-    
+
+    # Home button
+    home_button = st.button("Go to Home")
+    if home_button:
+        st.session_state.page = 'main'  # Navigate back to the main page
+
+def statistical_analysis():
+    st.title('Statistical Analysis')
+    st.write("This section will contain the statistical analysis logic.")
+
+    # Button for PCA analysis
+    pca_analysis_button = st.button('PCA Analysis')
+    if pca_analysis_button:
+        st.write("Performing PCA Analysis...")
+        pca_plot()  # Call the PCA plot function
+
     # Home button
     home_button = st.button("Go to Home")
     if home_button:
@@ -47,18 +58,6 @@ def contour_plots():
         st.write("Generating Saturation Ratio Contour Plot...")
         plot_5x5_sr(X, scaler_X, sr_model)  # Call the plot_5x5_sr function to display the plot
 
-    # Home button
-    home_button = st.button("Go to Home")
-    if home_button:
-        st.session_state.page = 'main'  # Navigate back to the main page
-
-def statistical_analysis():
-    st.title('Statistical Analysis')
-    st.write("This section will contain the statistical analysis logic.")
-    
-    # You can add more statistical analysis logic here
-    st.write("Display your statistical analysis results here.")
-    
     # Home button
     home_button = st.button("Go to Home")
     if home_button:
