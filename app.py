@@ -107,7 +107,7 @@ def main():
     if 'models' not in st.session_state:
         # Automatically load the models and data when the app is opened
         cr_model, sr_model = load_models()
-        X, scaler_X = load_preprocess_data()
+        df_subset, X, scaler_X = load_preprocess_data()
         st.session_state.models = (cr_model, sr_model)
         st.session_state.data = (X, scaler_X)
 
