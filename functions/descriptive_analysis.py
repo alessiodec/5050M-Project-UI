@@ -1,4 +1,4 @@
-import streamlit as slt
+import streamlit as st
 
 def descriptive_analysis(X):
     st.write("Descriptive Statistics:")
