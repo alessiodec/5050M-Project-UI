@@ -74,8 +74,13 @@ def statistical_analysis():
     # Button for Descriptive Statistics
     descriptive_stats_button = st.button('Descriptive Statistics')
     if descriptive_stats_button:
-        st.write("Descriptive Statistics:")
-        descriptive_analysis(X)  # Pass X directly to descriptive_analysis
+        st.write("Descriptive Statistics button clicked.")
+        st.write("Checking if data exists in session state:")
+        st.write(X)  # Display the data to ensure it is loaded properly
+        st.write("Checking if data is a DataFrame:")
+        st.write(type(X))  # Check the type of X to ensure it’s a DataFrame
+        st.write("Displaying Descriptive Statistics:")
+        st.write(X.describe())  # Now display the descriptive statistics
 
     input_histograms_button = st.button('Input Histograms')
     if input_histograms_button:
