@@ -11,6 +11,9 @@ st.title("Main Dashboard")
 def data_analysis():
     st.title('Data Analysis')
     st.write("This section will contain your data analysis logic.")
+
+    # Create a button for statistical analysis
+    contour_button = st.button('Statistical Analysis')
     
     # Create a button for contour plots
     contour_button = st.button('Contour Plots')
