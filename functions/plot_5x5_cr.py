@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import streamlit as st 
 
 def plot_5x5_cr(X, scaler_X, cr_model):
     mid_points = np.median(X, axis=0)  # Calculate the median of X across columns
