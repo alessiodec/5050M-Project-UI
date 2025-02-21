@@ -13,13 +13,14 @@ def input_histogram():
     # Ensure no NaNs and the data is valid for log10 transformation
     df_subset.iloc[:, [2, 3, 4]] = np.log10(df_subset.iloc[:, [2, 3, 4]].replace(0, np.nan))  # Replace 0s with NaN before applying log10
     
-    # Clear the figure
-    plt.clf()
+    # Clear the figure to avoid overwriting
+    plt.figure(figsize=(12, 8))
 
     # Plot histograms
-    df_subset.hist(bins=30, figsize=(12, 8))
+    df_subset.hist(bins=30)
     plt.suptitle("Histograms of Inputs", y=0.95)
     plt.tight_layout()
 
     # Display the plot in Streamlit
     st.pyplot(plt)
+    plt.close()  # Close plt to prevent unwanted figures being displayed
