@@ -3,6 +3,7 @@ import pandas as pd  # Ensure pandas is imported
 
 def descriptive_analysis(X):
     st.write("Descriptive Statistics:")
+    st.write("X:")
     
     # Ensure X is a pandas DataFrame, if it's not, convert it
     if not isinstance(X, pd.DataFrame):
