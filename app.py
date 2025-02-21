@@ -6,6 +6,7 @@ from functions.load_preprocess_data import load_preprocess_data  # Import the lo
 from functions.plot_5x5_cr import plot_5x5_cr  # Import the correct function for corrosion rate
 from functions.plot_5x5_sr import plot_5x5_sr  # Import the correct function for saturation ratio
 from functions.pca_plot import pca_plot  # Import the PCA plot function (you need to create this function)
+from functions.descriptive_analysis import descriptive_analysis
 
 # Main app content
 st.title("Main Dashboard")
