@@ -8,19 +8,19 @@ def input_histogram():
     df = pd.read_csv(csv_url)
     
     cols_to_keep = list(range(0, 5))  # pH, T, PCO2, v, d
-    df_subset = df.iloc[:, cols_to_keep].copy()  # make new df
+    df_subset = df.iloc[:, cols_to_keep].copy()  # Make a new DataFrame with the selected columns
     
-    # Ensure no NaNs and the data is valid for log10 transformation
-    df_subset.iloc[:, [2, 3, 4]] = np.log10(df_subset.iloc[:, [2, 3, 4]].replace(0, np.nan))  # Replace 0s with NaN before applying log10
+    # Replace 0s with NaN and apply log10 transformation on columns 2, 3, and 4
+    df_subset.iloc[:, [2, 3, 4]] = np.log10(df_subset.iloc[:, [2, 3, 4]].replace(0, np.nan))
     
-    # Clear the figure to avoid overwriting
+    # Create a new figure for the histograms
     plt.figure(figsize=(12, 8))
-
-    # Plot histograms
+    
+    # Plot histograms for each column in the DataFrame
     df_subset.hist(bins=30)
     plt.suptitle("Histograms of Inputs", y=0.95)
     plt.tight_layout()
-
-    # Display the plot in Streamlit
-    st.pyplot(plt)
-    plt.close()  # Close plt to prevent unwanted figures being displayed
+    
+    # Display the current figure in Streamlit
+    st.pyplot(plt.gcf())
+    plt.close()  # Close the figure to prevent overlap with future plots
