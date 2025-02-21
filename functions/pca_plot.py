@@ -6,14 +6,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 import streamlit as st
 
-def pca_plot():
-    # Predefined CSV URL and columns for PCA
-    csv_url = "https://drive.google.com/uc?export=download&id=10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
+def pca_plot(df_subset):
     columns = [0, 1, 2, 3, 4]  # Indices of the columns for PCA analysis
-
-    # Read the dataset
-    df = pd.read_csv(csv_url)
-    pca_data = df.iloc[:, columns]  # Select the columns for PCA
+    
+    pca_data = df_subset.iloc[:, columns]  # Select the columns for PCA
 
     # Standardize the features
     scaler = StandardScaler()
