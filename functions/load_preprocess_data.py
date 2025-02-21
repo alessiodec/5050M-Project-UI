@@ -22,5 +22,6 @@ def load_preprocess_data():
 
     # Create standard scaler instances
     scaler_X = StandardScaler()
+    scaler_X.fit(X)  # Fit the scaler on the dataset
 
     return X, scaler_X
