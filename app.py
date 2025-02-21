@@ -108,14 +108,14 @@ def statistical_analysis():
 
     input_histograms_button = st.button('Input Histograms')
     if input_histograms_button:
-        st.write("Creating Input Histograms...")
-        # You can implement the logic for input histograms here later
-        input_histogram()
+        st.write("Input Histograms button pressed!")
+        input_histogram()  # Call the input_histogram function
 
     # Home button
     home_button = st.button("Go to Home")
     if home_button:
         st.session_state.page = 'main'  # Navigate back to the main page
+
 
 ################################### OPTIMISATION PAGE ###################################
 
