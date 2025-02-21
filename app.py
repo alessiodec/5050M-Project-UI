@@ -58,12 +58,12 @@ def statistical_analysis():
     st.write("This section will contain the statistical analysis logic.")
 
     # Access the data
-    if 'data' not in st.session_state or 'df_subset' not in st.session_state:
+    if 'data' not in st.session_state:
         st.write("Data not found. Please load the data first.")
         return
 
     X, scaler_X = st.session_state.data
-  
+
     # Button for PCA analysis
     pca_analysis_button = st.button('PCA Analysis')
     if pca_analysis_button:
@@ -111,10 +111,10 @@ def main():
     if 'page' not in st.session_state:
         st.session_state.page = 'main'  # Set default page to 'main'
 
-    if 'models' not in st.session_state:
+    if 'models' not in st.session_state or 'data' not in st.session_state:
         # Automatically load the models and data when the app is opened
         cr_model, sr_model = load_models()
-        X, scaler_X = load_preprocess_data()
+        X, scaler_X = load_preprocess_data()  # load_preprocess_data will no longer return df_subset
         st.session_state.models = (cr_model, sr_model)
         st.session_state.data = (X, scaler_X)
 
