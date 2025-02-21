@@ -114,9 +114,9 @@ def main():
     if 'models' not in st.session_state or 'data' not in st.session_state:
         # Automatically load the models and data when the app is opened
         cr_model, sr_model = load_models()
-        X, scaler_X = load_preprocess_data()  # load_preprocess_data will no longer return df_subset
+        df_subset, X, scaler_X = load_preprocess_data()  # load_preprocess_data will no longer return df_subset
         st.session_state.models = (cr_model, sr_model)
-        st.session_state.data = (X, scaler_X)
+        st.session_state.data = (df_subset, X, scaler_X)
 
     if st.session_state.page == 'main':
         st.title('Main Menu')
