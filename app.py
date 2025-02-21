@@ -13,13 +13,13 @@ def data_analysis():
     st.title('Data Analysis')
     st.write("This section will contain your data analysis logic.")
 
-    # Create a button for statistical analysis
+    # Create buttons for both statistical analysis and contour plots
     statistical_analysis_button = st.button('Statistical Analysis')
+    contour_button = st.button('Contour Plots')
+
     if statistical_analysis_button:
         st.session_state.page = 'statistical_analysis'  # Navigate to the statistical analysis page
-
-    # Create a button for contour plots
-    contour_button = st.button('Contour Plots')
+    
     if contour_button:
         st.session_state.page = 'contour_plots'  # Navigate to the contour plots page
     
@@ -62,11 +62,6 @@ def statistical_analysis():
     if pca_analysis_button:
         st.write("Performing PCA Analysis...")
         pca_plot()  # Call the PCA plot function
-
-    # Button for contour plots (after statistical analysis)
-    contour_button = st.button('Contour Plots')
-    if contour_button:
-        st.session_state.page = 'contour_plots'  # Navigate to the contour plots page
 
     # Home button
     home_button = st.button("Go to Home")
