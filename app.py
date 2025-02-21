@@ -1,3 +1,5 @@
+################################### IMPORT LIBRARIES // FUNCTIONS HERE ###################################
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -11,7 +13,9 @@ from functions.descriptive_analysis import descriptive_analysis
 # Main app content
 st.title("Main Dashboard")
 
-# Define functions for each section
+################################### DEFINE FUNCTIONS FOR EACH STEP OF THE APP ###################################
+
+################################### MAIN PAGE ###################################
 def data_analysis():
     st.title('Data Analysis')
     st.write("This section will contain your data analysis logic.")
@@ -30,6 +34,28 @@ def data_analysis():
     home_button = st.button("Go to Home")
     if home_button:
         st.session_state.page = 'main'  # Navigate back to the main page
+
+def optimisation():
+    st.title('Optimisation')
+    st.write("This section will contain your optimisation logic.")
+    # Add more content related to optimisation here
+
+    # Home button
+    home_button = st.button("Go to Home")
+    if home_button:
+        st.session_state.page = 'main'  # Navigate back to the main page
+
+def physical_relationship_analysis():
+    st.title('Physical Relationship Analysis')
+    st.write("This section will contain your physical relationship analysis logic.")
+    # Add more content related to physical relationship analysis here
+
+    # Home button
+    home_button = st.button("Go to Home")
+    if home_button:
+        st.session_state.page = 'main'  # Navigate back to the main page
+
+################################### DATA ANALYSIS PAGE ###################################
 
 def contour_plots():
     st.title('Contour Plots')
@@ -89,25 +115,11 @@ def statistical_analysis():
     if home_button:
         st.session_state.page = 'main'  # Navigate back to the main page
 
-def optimisation():
-    st.title('Optimisation')
-    st.write("This section will contain your optimisation logic.")
-    # Add more content related to optimisation here
+################################### OPTIMISATION PAGE ###################################
 
-    # Home button
-    home_button = st.button("Go to Home")
-    if home_button:
-        st.session_state.page = 'main'  # Navigate back to the main page
 
-def physical_relationship_analysis():
-    st.title('Physical Relationship Analysis')
-    st.write("This section will contain your physical relationship analysis logic.")
-    # Add more content related to physical relationship analysis here
+################################### PHYSICAL RELATIONSHIP ANALYSIS PAGE ###################################
 
-    # Home button
-    home_button = st.button("Go to Home")
-    if home_button:
-        st.session_state.page = 'main'  # Navigate back to the main page
 
 # Main page content
 def main():
