@@ -64,7 +64,7 @@ def contour_plots():
 
     # Access preloaded models and data
     cr_model, sr_model = st.session_state.models
-    X, scaler_X = st.session_state.data
+    df_subset, X, scaler_X = st.session_state.data
 
     # Button for Corrosion Rate contour plot
     cr_button = st.button('Corrosion Rate')
@@ -92,7 +92,7 @@ def statistical_analysis():
         st.write("Data not found. Please load the data first.")
         return
 
-    X, scaler_X = st.session_state.data
+    df_subset, X, scaler_X = st.session_state.data
 
     # Button for PCA analysis
     pca_analysis_button = st.button('PCA Analysis')
