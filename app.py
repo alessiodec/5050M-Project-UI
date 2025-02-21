@@ -7,16 +7,6 @@ from functions.plot_5x5_cr import plot_5x5_cr  # Import the correct function for
 from functions.plot_5x5_sr import plot_5x5_sr  # Import the correct function for saturation ratio
 from functions.pca_plot import pca_plot  # Import the PCA plot function (you need to create this function)
 
-# Function for Descriptive Statistics
-def descriptive_analysis(X, column_names):
-    st.write("Descriptive Statistics:")
-    
-    # Convert X to a pandas DataFrame before calling .describe()
-    X_df = pd.DataFrame(X, columns=column_names)  # Use passed column names
-
-    # Now you can call .describe() on the DataFrame
-    st.write(X_df.describe())
-
 # Main app content
 st.title("Main Dashboard")
 
