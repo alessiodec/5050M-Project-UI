@@ -31,8 +31,9 @@ def contour_plots():
     st.title('Contour Plots')
     st.write("Choose the plot to display:")
 
-    cr_model, sr_model = load_models()
-    X, scaler_X = load_preprocess_data()
+    # Access preloaded models and data
+    cr_model, sr_model = st.session_state.models
+    X, scaler_X = st.session_state.data
 
     # Button for Corrosion Rate contour plot
     cr_button = st.button('Corrosion Rate')
@@ -87,7 +88,14 @@ def physical_relationship_analysis():
 def main():
     if 'page' not in st.session_state:
         st.session_state.page = 'main'  # Set default page to 'main'
-    
+
+    if 'models' not in st.session_state:
+        # Automatically load the models and data when the app is opened
+        cr_model, sr_model = load_models()
+        X, scaler_X = load_preprocess_data()
+        st.session_state.models = (cr_model, sr_model)
+        st.session_state.data = (X, scaler_X)
+
     if st.session_state.page == 'main':
         st.title('Main Menu')
         st.write("Select an option to proceed:")
