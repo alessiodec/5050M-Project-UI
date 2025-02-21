@@ -4,7 +4,12 @@ from functions.load_preprocess_data import load_preprocess_data  # Import the lo
 from functions.plot_5x5_cr import plot_5x5_cr  # Import the correct function for corrosion rate
 from functions.plot_5x5_sr import plot_5x5_sr  # Import the correct function for saturation ratio
 from functions.pca_plot import pca_plot  # Import the PCA plot function (you need to create this function)
-from functions.descriptive_analysis import descriptive_analysis  # Import the correct function for descriptive analysis
+
+# Function for Descriptive Statistics
+def descriptive_analysis(X):
+    st.write("Descriptive Statistics:")
+    st.write(X.describe())  # Display the descriptive statistics in the Streamlit app
+
 
 # Main app content
 st.title("Main Dashboard")
@@ -74,13 +79,8 @@ def statistical_analysis():
     # Button for Descriptive Statistics
     descriptive_stats_button = st.button('Descriptive Statistics')
     if descriptive_stats_button:
-        st.write("Descriptive Statistics button clicked.")
-        st.write("Checking if data exists in session state:")
-        st.write(X)  # Display the data to ensure it is loaded properly
-        st.write("Checking if data is a DataFrame:")
-        st.write(type(X))  # Check the type of X to ensure it’s a DataFrame
-        st.write("Displaying Descriptive Statistics:")
-        st.write(X.describe())  # Now display the descriptive statistics
+        st.write("Descriptive Statistics for the dataset:")
+        st.write(X.describe())  # Display the descriptive statistics directly
 
     input_histograms_button = st.button('Input Histograms')
     if input_histograms_button:
