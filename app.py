@@ -18,21 +18,11 @@ def data_analysis():
     if statistical_analysis_button:
         st.session_state.page = 'statistical_analysis'  # Navigate to the statistical analysis page
 
-    # Home button
-    home_button = st.button("Go to Home")
-    if home_button:
-        st.session_state.page = 'main'  # Navigate back to the main page
-
-def statistical_analysis():
-    st.title('Statistical Analysis')
-    st.write("This section will contain the statistical analysis logic.")
-
-    # Button for PCA analysis
-    pca_analysis_button = st.button('PCA Analysis')
-    if pca_analysis_button:
-        st.write("Performing PCA Analysis...")
-        pca_plot()  # Call the PCA plot function
-
+    # Create a button for contour plots
+    contour_button = st.button('Contour Plots')
+    if contour_button:
+        st.session_state.page = 'contour_plots'  # Navigate to the contour plots page
+    
     # Home button
     home_button = st.button("Go to Home")
     if home_button:
@@ -57,6 +47,26 @@ def contour_plots():
     if sr_button:
         st.write("Generating Saturation Ratio Contour Plot...")
         plot_5x5_sr(X, scaler_X, sr_model)  # Call the plot_5x5_sr function to display the plot
+
+    # Home button
+    home_button = st.button("Go to Home")
+    if home_button:
+        st.session_state.page = 'main'  # Navigate back to the main page
+
+def statistical_analysis():
+    st.title('Statistical Analysis')
+    st.write("This section will contain the statistical analysis logic.")
+
+    # Button for PCA analysis
+    pca_analysis_button = st.button('PCA Analysis')
+    if pca_analysis_button:
+        st.write("Performing PCA Analysis...")
+        pca_plot()  # Call the PCA plot function
+
+    # Button for contour plots (after statistical analysis)
+    contour_button = st.button('Contour Plots')
+    if contour_button:
+        st.session_state.page = 'contour_plots'  # Navigate to the contour plots page
 
     # Home button
     home_button = st.button("Go to Home")
