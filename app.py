@@ -75,6 +75,7 @@ def statistical_analysis():
     if descriptive_stats_button:
         st.write("Descriptive Statistics will be displayed here.")
         # You can implement the logic for descriptive statistics here later
+        descriptive_analysis(df_subset)
 
     input_histograms_button = st.button('Input Histograms')
     if input_histograms_button:
