@@ -9,6 +9,7 @@ from functions.plot_5x5_cr import plot_5x5_cr  # Import the correct function for
 from functions.plot_5x5_sr import plot_5x5_sr  # Import the correct function for saturation ratio
 from functions.pca_plot import pca_plot  # Import the PCA plot function (you need to create this function)
 from functions.descriptive_analysis import descriptive_analysis
+from functions.input_histogram import input_histogram
 
 # Main app content
 st.title("Main Dashboard")
@@ -109,6 +110,7 @@ def statistical_analysis():
     if input_histograms_button:
         st.write("Input Histograms will be displayed here.")
         # You can implement the logic for input histograms here later
+        input_histogram(df_subset)
 
     # Home button
     home_button = st.button("Go to Home")
