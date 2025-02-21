@@ -103,12 +103,12 @@ def statistical_analysis():
     # Button for Descriptive Statistics
     descriptive_stats_button = st.button('Descriptive Statistics')
     if descriptive_stats_button:
-        st.write("Descriptive Statistics for the dataset:")
+        st.write("Generating Statistical Description...")
         descriptive_analysis(X)  # Call the descriptive analysis function with X and column names
 
     input_histograms_button = st.button('Input Histograms')
     if input_histograms_button:
-        st.write("Input Histograms will be displayed here.")
+        st.write("Creating Input Histograms...")
         # You can implement the logic for input histograms here later
         input_histogram(df_subset)
 
