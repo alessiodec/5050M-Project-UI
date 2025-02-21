@@ -13,14 +13,14 @@ def data_analysis():
     st.write("This section will contain your data analysis logic.")
 
     # Create a button for statistical analysis
-    contour_button = st.button('Statistical Analysis')
+    statistical_analysis_button = st.button('Statistical Analysis')
+    if statistical_analysis_button:
+        st.session_state.page = 'statistical_analysis'  # Navigate to the statistical analysis page
     
-    # Create a button for contour plots
+    # Create a button for contour plots (if you still need it here)
     contour_button = st.button('Contour Plots')
-    
     if contour_button:
-        # Navigate to the contour plots page
-        st.session_state.page = 'contour_plots'
+        st.session_state.page = 'contour_plots'  # Navigate to the contour plots page
 
 def contour_plots():
     st.title('Contour Plots')
@@ -39,8 +39,14 @@ def contour_plots():
     sr_button = st.button('Saturation Ratio')
     if sr_button:
         st.write("Generating Saturation Ratio Contour Plot...")
-
         plot_5x5_sr(X, scaler_X, sr_model)  # Call the plot_5x5_sr function to display the plot
+
+def statistical_analysis():
+    st.title('Statistical Analysis')
+    st.write("This section will contain the statistical analysis logic.")
+    
+    # You can add more statistical analysis logic here
+    st.write("Display your statistical analysis results here.")
 
 def optimisation():
     st.title('Optimisation')
@@ -76,6 +82,9 @@ def main():
     
     elif st.session_state.page == 'data_analysis':
         data_analysis()
+
+    elif st.session_state.page == 'statistical_analysis':
+        statistical_analysis()  # Display the statistical analysis page
 
     elif st.session_state.page == 'contour_plots':
         contour_plots()
