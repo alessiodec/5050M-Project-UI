@@ -25,4 +25,4 @@ def load_preprocess_data():
     scaler_X = StandardScaler()
     scaler_X.fit(X)  # Fit the scaler on the dataset
 
-    return X, scaler_X
+    return df_subset, X, scaler_X
