@@ -1,26 +1,8 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import streamlit as st 
-
 def plot_5x5_sr(X, scaler_X, sr_model):
-    """
-    Generate a 5x5 grid of plots showing the Saturation Ratio (SR) predictions
-    for different input combinations.
-    
-    Parameters:
-    - sr_model: The trained saturation ratio model.
-    - X: The feature data used for predictions (scaled).
-    - scaler_X: The StandardScaler used to scale the features.
-    
-    Outputs:
-    - A 5x5 grid of contour plots displaying the predicted saturation ratios.
-    """
+    mid_points = np.median(X, axis=0)  # Calculate the median of X across columns
     
     # List of input names
-    var_names = ['pH', 'T (C)', 'log10 PCO2 (bar)', 'log10 v (ms-1)', 'log10 d (m)']
-    
-    # Calculate median for each input (baseline)
-    mid_points = np.median(X, axis=0)  # 1D array with 5 median values
+    var_names = ['pH', 'T (C)', 'log10 PCO2 (bar)', 'log10 v (ms-1)', 'log10 d ']
     
     # Get lower and upper bounds for each input to define grid ranges
     mins = X.min(axis=0)
@@ -58,8 +40,8 @@ def plot_5x5_sr(X, scaler_X, sr_model):
             # Use the DNN to predict SR for each set of scaled input values
             predictions_scaled = sr_model.predict(grid_points_scaled)
             
-            # Use predictions directly (no inverse scaling) and extract the first output for SR
-            saturation_ratio = predictions_scaled[:, 0].reshape(grid_x.shape)
+            # Use predictions directly (no inverse scaling) and extract the second output for SR
+            saturation_ratio = predictions_scaled[:, 1].reshape(grid_x.shape)  # Changed index to 1 for SR
             
             # Plot filled contour plot on the current subplot using the scaled predictions
             cont_fill = ax.contourf(grid_x, grid_y, saturation_ratio, levels=10, cmap='viridis')
@@ -74,10 +56,10 @@ def plot_5x5_sr(X, scaler_X, sr_model):
     # Adjust layout and add a global colorbar
     fig.subplots_adjust(right=0.9, hspace=0.4, wspace=0.4)
     cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])
-    fig.colorbar(cont_fill, cax=cbar_ax, label='Scaled Saturation Ratio')
+    fig.colorbar(cont_fill, cax=cbar_ax, label='Scaled Saturation Ratio')  # Changed label
     
     # Set a title for the entire plot
-    plt.suptitle('SR For Different Input Combinations', fontsize=18)
+    plt.suptitle('SR For Different Input Combinations', fontsize=18)  # Changed title
     
     # Render the plot in Streamlit
-    st.pyplot(fig)  # This will render the plot in Streamlit
+    st.pyplot(fig)
