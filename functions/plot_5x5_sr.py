@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import streamlit as st 
 
 def plot_5x5_sr(sr_model, X, scaler_X):
     """
