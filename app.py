@@ -63,13 +63,12 @@ def statistical_analysis():
         return
 
     X, scaler_X = st.session_state.data
-    df_subset = st.session_state.df_subset  # Access df_subset from session state
-
+  
     # Button for PCA analysis
     pca_analysis_button = st.button('PCA Analysis')
     if pca_analysis_button:
         st.write("Performing PCA Analysis...")
-        pca_plot(df_subset)  # Call the PCA plot function
+        pca_plot()  # Call the PCA plot function
 
     # Buttons for additional statistical analysis
     descriptive_stats_button = st.button('Descriptive Statistics')
@@ -115,7 +114,7 @@ def main():
     if 'models' not in st.session_state:
         # Automatically load the models and data when the app is opened
         cr_model, sr_model = load_models()
-        df_subset, X, scaler_X = load_preprocess_data()
+        X, scaler_X = load_preprocess_data()
         st.session_state.models = (cr_model, sr_model)
         st.session_state.data = (X, scaler_X)
         st.session_state.df_subset = df_subset  # Store df_subset in session state
