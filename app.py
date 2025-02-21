@@ -23,18 +23,20 @@ def contour_plots():
     st.title('Contour Plots')
     st.write("Choose the plot to display:")
 
+    cr_model, sr_model = load_models()
+    X, scaler_X = load_preprocess_data()
+
     # Button for Corrosion Rate contour plot
     cr_button = st.button('Corrosion Rate')
     if cr_button:
         st.write("Generating Corrosion Rate Contour Plot...")
-        cr_model, sr_model = load_models()
-        X, scaler_X = load_preprocess_data()
         plot_5x5_cr(X, scaler_X, cr_model)  # Call the plot_5x5_cr function to display the plot
 
     # Button for Saturation Ratio contour plot
     sr_button = st.button('Saturation Ratio')
     if sr_button:
         st.write("Generating Saturation Ratio Contour Plot...")
+
         plot_5x5_sr(X, scaler_X, sr_model)  # Call the plot_5x5_sr function to display the plot
 
 def optimisation():
