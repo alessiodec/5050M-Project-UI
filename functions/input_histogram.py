@@ -1,19 +1,22 @@
-import requests
+import matplotlib.pyplot as plt
+import streamlit as st
 import pandas as pd
-from io import StringIO
+import numpy as np
 
 def input_histogram():
     csv_url = "https://drive.google.com/uc?export=download&id=10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
-    response = requests.get(csv_url)
-    data = StringIO(response.text)
-    df = pd.read_csv(data)
+    df = pd.read_csv(csv_url)
     
     cols_to_keep = list(range(0, 5))  # pH, T, PCO2, v, d
     df_subset = df.iloc[:, cols_to_keep].copy()  # make new df
     
-    df_subset.iloc[:, [2, 3, 4]] = np.log10(df_subset.iloc[:, [2, 3, 4]])  # log10 PCO2, v, d
+    # Ensure no NaNs and the data is valid for log10 transformation
+    df_subset.iloc[:, [2, 3, 4]] = np.log10(df_subset.iloc[:, [2, 3, 4]].replace(0, np.nan))  # Replace 0s with NaN before applying log10
     
-    # Use .iloc to subset columns 1-5
+    # Clear the figure
+    plt.clf()
+
+    # Plot histograms
     df_subset.hist(bins=30, figsize=(12, 8))
     plt.suptitle("Histograms of Inputs", y=0.95)
     plt.tight_layout()
