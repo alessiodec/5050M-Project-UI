@@ -28,8 +28,8 @@ def contour_plots():
     if cr_button:
         st.write("Generating Corrosion Rate Contour Plot...")
         cr_model, sr_model = load_models()
-        X, X_train, X_test, y_train, y_test, scaler_X, scaler_y = load_preprocess_data()
-        plot_5x5_cr(cr_model, X_train, scaler_X)  # Call the plot_5x5_cr function to display the plot
+        X, scaler_X = load_preprocess_data()
+        plot_5x5_cr(X, scaler_X, cr_model)  # Call the plot_5x5_cr function to display the plot
 
     # Button for Saturation Ratio contour plot
     sr_button = st.button('Saturation Ratio')
