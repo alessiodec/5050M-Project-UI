@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+import numpy as np
 from functions.load_models import load_models  # Import the load_models function
 from functions.load_preprocess_data import load_preprocess_data  # Import the load_preprocess_data function
 from functions.plot_5x5_cr import plot_5x5_cr  # Import the correct function for corrosion rate
@@ -6,10 +8,14 @@ from functions.plot_5x5_sr import plot_5x5_sr  # Import the correct function for
 from functions.pca_plot import pca_plot  # Import the PCA plot function (you need to create this function)
 
 # Function for Descriptive Statistics
-def descriptive_analysis(X):
+def descriptive_analysis(X, column_names):
     st.write("Descriptive Statistics:")
-    st.write(X.describe())  # Display the descriptive statistics in the Streamlit app
+    
+    # Convert X to a pandas DataFrame before calling .describe()
+    X_df = pd.DataFrame(X, columns=column_names)  # Use passed column names
 
+    # Now you can call .describe() on the DataFrame
+    st.write(X_df.describe())
 
 # Main app content
 st.title("Main Dashboard")
@@ -70,6 +76,9 @@ def statistical_analysis():
 
     X, scaler_X = st.session_state.data
 
+    # Extract column names (assuming df_subset was the original DataFrame)
+    column_names = ['pH', 'T', 'PCO2', 'v', 'd']  # Column names based on your data
+
     # Button for PCA analysis
     pca_analysis_button = st.button('PCA Analysis')
     if pca_analysis_button:
@@ -80,7 +89,7 @@ def statistical_analysis():
     descriptive_stats_button = st.button('Descriptive Statistics')
     if descriptive_stats_button:
         st.write("Descriptive Statistics for the dataset:")
-        st.write(X.describe())  # Display the descriptive statistics directly
+        descriptive_analysis(X, column_names)  # Call the descriptive analysis function with X and column names
 
     input_histograms_button = st.button('Input Histograms')
     if input_histograms_button:
