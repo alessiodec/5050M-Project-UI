@@ -89,7 +89,7 @@ def statistical_analysis():
         descriptive_analysis(X)
 
     if st.button('Input Histograms'):
-        st.write("Input Histograms button pressed!")
+        st.write("Generating Input Histograms...")
         input_histogram()
 
     if st.button("Go to Home"):
