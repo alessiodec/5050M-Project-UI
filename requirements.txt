@@ -7,5 +7,3 @@ tensorflow
 catboost
 gdown
 seaborn
-requests
-io
