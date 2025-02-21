@@ -67,9 +67,6 @@ def statistical_analysis():
 
     X, scaler_X = st.session_state.data
 
-    # Extract column names (assuming df_subset was the original DataFrame)
-    column_names = ['pH', 'T', 'PCO2', 'v', 'd']  # Column names based on your data
-
     # Button for PCA analysis
     pca_analysis_button = st.button('PCA Analysis')
     if pca_analysis_button:
@@ -80,7 +77,7 @@ def statistical_analysis():
     descriptive_stats_button = st.button('Descriptive Statistics')
     if descriptive_stats_button:
         st.write("Descriptive Statistics for the dataset:")
-        descriptive_analysis(X, column_names)  # Call the descriptive analysis function with X and column names
+        descriptive_analysis(X)  # Call the descriptive analysis function with X and column names
 
     input_histograms_button = st.button('Input Histograms')
     if input_histograms_button:
