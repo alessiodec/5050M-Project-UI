@@ -47,19 +47,28 @@ def minimise_cr_page():
     st.write("Enter values for pipe diameter (`d`) and CO₂ partial pressure (`PCO₂`) to find the minimum CR.")
 
     # User inputs
-    d = st.number_input("Enter Pipe Diameter (d):", min_value=0.01, max_value=10.0, step=0.01)
-    pco2 = st.number_input("Enter CO₂ Partial Pressure (PCO₂):", min_value=0.001, max_value=10.0, step=0.001)
+    d = st.number_input("Enter Pipe Diameter (d):", min_value=0.01, max_value=10.0, step=0.01, value=0.5)
+    pco2 = st.number_input("Enter CO₂ Partial Pressure (PCO₂):", min_value=0.001, max_value=10.0, step=0.001, value=20000.0)
+
+    # Convert PCO₂ to log10 scale before optimisation
+    pco2_log = np.log10(pco2)
 
     # Run optimisation when button is clicked
     if st.button("Run Optimisation"):
         try:
-            best_d, best_pco2, min_cr = minimise_cr(d, pco2)
-            st.write(f"✅ **Optimal Parameters Found:** d = {best_d}, PCO₂ = {best_pco2}, Min CR = {min_cr:.5f}")
+            best_params, min_cr = minimise_cr(d, pco2_log)
+            
+            st.write("✅ **Optimisation Completed!**")
+            st.write(f"**Optimal Pipe Diameter (d):** {best_params[0][4]:.3f}")
+            st.write(f"**Optimal CO₂ Partial Pressure (PCO₂):** {best_params[0][2]:.3f}")
+            st.write(f"**Minimised Corrosion Rate (CR):** {min_cr:.5f}")
+
         except Exception as e:
             st.error(f"Error running optimisation: {e}")
 
     if st.button("Go to Optimisation Menu"):
         st.session_state.page = 'optimisation'
+
 
 ################################### MAIN APP ###################################
 
