@@ -57,8 +57,7 @@ def run_heatsink_analysis(pop_size, pop_retention, num_iterations):
 
     # ---- Evolution Loop with Real-Time Graph Updates ----
     st.write("📈 Running Evolution Process...")
-    # We'll use a placeholder to update the plot in place.
-    chart_placeholder = st.empty()
+    chart_placeholder = st.empty()  # Placeholder for dynamic graph updates
 
     # Initialize tracking arrays
     avg_fitness_arr = []
@@ -66,12 +65,15 @@ def run_heatsink_analysis(pop_size, pop_retention, num_iterations):
     best_fitness_arr = []
     iterations = []
 
+    # IMPORTANT: Initialize new_population from init_population
+    new_population = init_population.copy()
+
     evolution_start = time.time()
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         for i in range(num_iterations):
-            # Generate new population from current population copy
+            # Generate new population from current new_population copy
             new_population = Engine.generate_new_population(population=new_population.copy(), verbose=1)
             avg_fitness, avg_complexity, optimal_fitness = Engine.evaluate_population(new_population)
 
@@ -83,7 +85,7 @@ def run_heatsink_analysis(pop_size, pop_retention, num_iterations):
             elapsed_time = time.time() - evolution_start
             st.write(f"Iteration {i+1}: Best Fit={optimal_fitness:.8f}, Avg Fit={avg_fitness:.8f}, Elapsed Time={elapsed_time:.2f}s")
 
-            # Update graph dynamically
+            # Clear and update the plot dynamically
             fig, ax = plt.subplots(figsize=(8, 6))
             ax.plot(iterations, avg_fitness_arr, 'bo-', label="Avg Fitness")
             ax.plot(iterations, avg_complexity_arr, 'ro-', label="Complexity")
