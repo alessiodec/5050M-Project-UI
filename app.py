@@ -40,30 +40,45 @@ def optimisation():
     if st.button("Go to Home"):
         st.session_state.page = 'main'
 
+
 def physical_relationship_analysis():
     st.title('Physical Relationship Analysis')
     st.write("This section will contain your physical relationship analysis logic.")
     
-    # Load Heatsink Data Button
+    # Check if heatsink data is already loaded
+    if "heatsink_data" not in st.session_state:
+        st.session_state["heatsink_loaded"] = False  # Flag to track loading
+        st.session_state["heatsink_data"] = None
+
+    # Button to load heatsink data
     if st.button("Load Heatsink Data"):
         from functions.ethan.load_hs_data import load_heatsink_data
         df, X, y, standardised_y, mean_y, std_y = load_heatsink_data(display_output=True)
         
-        # Store in session state to persist
+        # Store in session state
         st.session_state["heatsink_data"] = (df, X, y, standardised_y, mean_y, std_y)
-        st.session_state["heatsink_loaded"] = True  # Flag to check if data is loaded
+        st.session_state["heatsink_loaded"] = True
         
-        st.write("Heatsink data loaded successfully!")
+        st.write("✅ Heatsink data loaded successfully!")
         st.write(df)
 
-    # Check if heatsink data is loaded
-    if "heatsink_loaded" in st.session_state and st.session_state["heatsink_loaded"]:
+    # Only show the next inputs if the data is loaded
+    if st.session_state["heatsink_loaded"]:
         st.write("✅ Heatsink Data is Loaded.")
 
-        # Run Heatsink Analysis Button
+        # User input for Population Size and Retention Size
+        if "pop_size" not in st.session_state:
+            st.session_state.pop_size = 1000  # Default value
+        if "pop_retention" not in st.session_state:
+            st.session_state.pop_retention = 20  # Default value
+
+        st.session_state.pop_size = st.number_input("Enter Population Size:", min_value=100, max_value=10000, value=st.session_state.pop_size, step=100)
+        st.session_state.pop_retention = st.number_input("Enter Population Retention Size:", min_value=10, max_value=1000, value=st.session_state.pop_retention, step=10)
+
+        # Button to run analysis
         if st.button("Run Heatsink Analysis"):
             from functions.ethan.heatsink_analysis import run_heatsink_analysis
-            run_heatsink_analysis()  # Now it should work!
+            run_heatsink_analysis(st.session_state.pop_size, st.session_state.pop_retention)
 
     # Go back to home button
     if st.button("Go to Home"):
