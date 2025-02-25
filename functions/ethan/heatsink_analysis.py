@@ -3,33 +3,32 @@ from . import config
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-import streamlit as st  # Streamlit-compatible plotting
+import streamlit as st
 import warnings
 
-def run_heatsink_analysis(pop_size, pop_retention):
+def run_heatsink_analysis(pop_size, pop_retention, num_iterations):
     """
-    Runs the heatsink analysis based on user-defined population parameters.
+    Runs the heatsink analysis based on user-defined population parameters and number of iterations.
 
     Args:
         pop_size (int): The number of individuals in the population.
         pop_retention (int): The number of individuals retained after selection.
+        num_iterations (int): The number of iterations (generations) to run the evolution process.
     """
-
     # Update the configuration
     config.POPULATION_SIZE = pop_size
     config.POPULATION_RETENTION_SIZE = pop_retention
     config.FIT_THRESHOLD = 10  # Keeping the threshold constant
 
-    # Ensure required data exists
+    # Ensure required data exists in session state
     if "heatsink_data" not in st.session_state:
         st.error("❌ Heatsink data has not been loaded. Run 'Load Heatsink Data' first.")
         return
 
-    # Unpack stored heatsink data
+    # Unpack stored heatsink data and update config.X and config.y
     df, X, y, standardised_y, mean_y, std_y = st.session_state["heatsink_data"]
-    config.X, config.y = X, standardised_y  # Update global config
+    config.X, config.y = X, standardised_y
 
-    # ---- CELL 4: Initialize Population ----
     st.write("🚀 Initializing Population... This may take a moment.")
     start_time = time.time()
 
@@ -40,14 +39,13 @@ def run_heatsink_analysis(pop_size, pop_retention):
 
     st.write(f"✅ Population initialized in {time.time() - start_time:.2f} seconds")
 
-    # Display population info
-    for i, individual in enumerate(init_population[:10]):  # Show only first 10 for brevity
+    # Display a few individuals for reference
+    for i, individual in enumerate(init_population[:10]):
         st.text(f"{i}: Fitness={individual.fitness:.4f}, Complexity={individual.complexity}, Eq={individual.individual}")
 
     Engine.evaluate_population(init_population)
 
-    # ---- CELL 5: Simplify Population ----
-    st.write("⚙️ Simplifying and Cleaning Population...")
+    st.write("⚙️ Simplifying Population...")
     start_time = time.time()
 
     with st.spinner("Simplifying expressions..."):
@@ -57,28 +55,46 @@ def run_heatsink_analysis(pop_size, pop_retention):
 
     st.write(f"✅ Population simplified in {time.time() - start_time:.2f} seconds")
 
-    # ---- CELL 6: Real-Time Pareto Front Visualization ----
-    st.write("📈 Generating Pareto Front Visualization...")
-    pareto_front = Engine.return_pareto_front(init_population)
-    pareto_plot_data = np.array([(ind.fitness, ind.complexity) for ind in pareto_front])
-    population_plot_data = np.array([(ind.fitness, ind.complexity) for ind in init_population])
-    utopia_point = [min(population_plot_data[:, 1]), min(population_plot_data[:, 0])]
+    # ---- Evolution Loop with Real-Time Graph Updates ----
+    st.write("📈 Running Evolution Process...")
+    # We'll use a placeholder to update the plot in place.
+    chart_placeholder = st.empty()
 
-    plot_placeholder = st.empty()  # Create a Streamlit placeholder for dynamic updates
+    # Initialize tracking arrays
+    avg_fitness_arr = []
+    avg_complexity_arr = []
+    best_fitness_arr = []
+    iterations = []
 
-    for i in range(1, len(population_plot_data) + 1):
-        fig, ax = plt.subplots(figsize=(8, 6))
-        ax.scatter(population_plot_data[:i, 1], population_plot_data[:i, 0], s=15, label="Population")
-        ax.scatter(pareto_plot_data[:, 1], pareto_plot_data[:, 0], s=15, color='red', label="Pareto Front")
-        ax.scatter(utopia_point[0], utopia_point[1], s=50, color='green', label="Utopia Point")
+    evolution_start = time.time()
 
-        ax.set_yscale("log")
-        ax.set_xlabel("Complexity")
-        ax.set_ylabel("Fitness")
-        ax.legend()
-        ax.set_title("Real-Time Update: Pareto Front & Population")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        for i in range(num_iterations):
+            # Generate new population from current population copy
+            new_population = Engine.generate_new_population(population=new_population.copy(), verbose=1)
+            avg_fitness, avg_complexity, optimal_fitness = Engine.evaluate_population(new_population)
 
-        plot_placeholder.pyplot(fig)  # Update the plot in Streamlit
-        time.sleep(0.01)  # Simulate real-time update delay
+            avg_fitness_arr.append(avg_fitness)
+            avg_complexity_arr.append(avg_complexity)
+            best_fitness_arr.append(optimal_fitness)
+            iterations.append(i + 1)
+
+            elapsed_time = time.time() - evolution_start
+            st.write(f"Iteration {i+1}: Best Fit={optimal_fitness:.8f}, Avg Fit={avg_fitness:.8f}, Elapsed Time={elapsed_time:.2f}s")
+
+            # Update graph dynamically
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.plot(iterations, avg_fitness_arr, 'bo-', label="Avg Fitness")
+            ax.plot(iterations, avg_complexity_arr, 'ro-', label="Complexity")
+            ax.plot(iterations, best_fitness_arr, 'go-', label="Best Fitness")
+            ax.set_xlabel("Iteration")
+            ax.set_ylabel("Fitness - 1-$R^2$")
+            ax.set_yscale("log")
+            ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+            ax.set_title("Population Metrics Over Iterations")
+            chart_placeholder.pyplot(fig)
+
+            time.sleep(0.1)
 
     st.success("✅ Heatsink Analysis Completed!")
