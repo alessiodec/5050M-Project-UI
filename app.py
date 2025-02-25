@@ -40,7 +40,6 @@ def optimisation():
     if st.button("Go to Home"):
         st.session_state.page = 'main'
 
-
 def physical_relationship_analysis():
     st.title('Physical Relationship Analysis')
     st.write("This section will contain your physical relationship analysis logic.")
@@ -72,8 +71,9 @@ def physical_relationship_analysis():
         if "pop_retention" not in st.session_state:
             st.session_state.pop_retention = 20  # Default value
 
-        st.session_state.pop_size = st.number_input("Enter Population Size:", min_value=100, max_value=10000, value=st.session_state.pop_size, step=100)
-        st.session_state.pop_retention = st.number_input("Enter Population Retention Size:", min_value=10, max_value=1000, value=st.session_state.pop_retention, step=10)
+        # Convert user inputs to integer
+        st.session_state.pop_size = int(st.number_input("Enter Population Size:", min_value=100, max_value=10000, value=st.session_state.pop_size, step=100))
+        st.session_state.pop_retention = int(st.number_input("Enter Population Retention Size:", min_value=10, max_value=1000, value=st.session_state.pop_retention, step=10))
 
         # Button to run analysis
         if st.button("Run Heatsink Analysis"):
@@ -83,8 +83,6 @@ def physical_relationship_analysis():
     # Go back to home button
     if st.button("Go to Home"):
         st.session_state.page = 'main'
-
-
 
 ################################### DATA ANALYSIS PAGE ###################################
 
