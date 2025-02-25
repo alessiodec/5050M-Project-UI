@@ -89,7 +89,7 @@ def minimise_cr_page():
     d = st.number_input("Enter Pipe Diameter (d):", min_value=d_min, max_value=d_max, step=0.01, value=d_min)
     pco2 = st.number_input("Enter CO₂ Partial Pressure (PCO₂):", min_value=pco2_min, max_value=pco2_max, step=0.001, value=pco2_min)
 
-    # User inputs are original values; the optimisation function will apply log10.
+    # User inputs are original values; the optimisation function will apply np.log10.
     if st.button("Run Optimisation"):
         try:
             best_params, min_cr = minimise_cr(d, pco2)
