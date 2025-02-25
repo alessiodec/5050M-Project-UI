@@ -14,14 +14,21 @@ def run_heatsink_analysis():
     """
     st.write("### Running Heatsink Analysis...")
 
-    # --- CONFIGURE PARAMETERS ---
-    config.POPULATION_SIZE = 1000
-    config.POPULATION_RETENTION_SIZE = 20
-    config.FIT_THRESHOLD = 10
+    # --- USER INPUT FOR POPULATION SIZE ---
+    config.POPULATION_SIZE = st.number_input(
+        "Enter Population Size", min_value=100, max_value=5000, value=1000, step=100
+    )
 
-    st.write("Population Size:", config.POPULATION_SIZE)
-    st.write("Population Retention Size:", config.POPULATION_RETENTION_SIZE)
-    st.write("Fitness Threshold:", config.FIT_THRESHOLD)
+    config.POPULATION_RETENTION_SIZE = st.number_input(
+        "Enter Population Retention Size", min_value=5, max_value=500, value=20, step=5
+    )
+
+    config.FIT_THRESHOLD = 10  # Keeping the fitness threshold constant
+
+    st.write("**Selected Parameters:**")
+    st.write(f"- Population Size: {config.POPULATION_SIZE}")
+    st.write(f"- Population Retention Size: {config.POPULATION_RETENTION_SIZE}")
+    st.write(f"- Fitness Threshold: {config.FIT_THRESHOLD}")
 
     # --- INITIALIZE AND EVALUATE POPULATION ---
     st.write("### Initializing Population...")
@@ -32,8 +39,11 @@ def run_heatsink_analysis():
         init_population = Engine.initialize_population(verbose=1)
 
         # Display individuals in Streamlit instead of printing
+        population_output = []
         for i, individual in enumerate(init_population):
-            st.write(f"{i}: Fitness={individual.fitness:.4f}, Complexity={individual.complexity}, Eq={individual.individual}")
+            population_output.append(f"{i}: Fitness={individual.fitness:.4f}, Complexity={individual.complexity}, Eq={individual.individual}")
+        
+        st.text("\n".join(population_output[:20]))  # Show first 20 individuals to avoid clutter
 
     Engine.evaluate_population(init_population)
     st.write(f"Elapsed time: {time.time() - start_time:.2f} seconds")
