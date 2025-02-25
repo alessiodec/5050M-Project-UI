@@ -7,12 +7,5 @@ tensorflow
 catboost
 gdown
 seaborn
-config
-random
-warnings
-math
-operator
 deap
-functools
-datetime
 sympy
