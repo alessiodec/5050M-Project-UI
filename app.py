@@ -44,18 +44,28 @@ def physical_relationship_analysis():
     st.title('Physical Relationship Analysis')
     st.write("This section will contain your physical relationship analysis logic.")
     
-    # Button for loading the heatsink dataset
+    # Load Heatsink Data Button
     if st.button("Load Heatsink Data"):
         from functions.ethan.load_hs_data import load_heatsink_data
         df, X, y, standardised_y, mean_y, std_y = load_heatsink_data(display_output=True)
+        
+        # Store in session state to persist
+        st.session_state["heatsink_data"] = (df, X, y, standardised_y, mean_y, std_y)
+        st.session_state["heatsink_loaded"] = True  # Flag to check if data is loaded
+        
         st.write("Heatsink data loaded successfully!")
         st.write(df)
 
-        # Ask user if they want to proceed with the analysis
+    # Check if heatsink data is loaded
+    if "heatsink_loaded" in st.session_state and st.session_state["heatsink_loaded"]:
+        st.write("✅ Heatsink Data is Loaded.")
+
+        # Run Heatsink Analysis Button
         if st.button("Run Heatsink Analysis"):
             from functions.ethan.heatsink_analysis import run_heatsink_analysis
-            run_heatsink_analysis()
+            run_heatsink_analysis()  # Now it should work!
 
+    # Go back to home button
     if st.button("Go to Home"):
         st.session_state.page = 'main'
 
