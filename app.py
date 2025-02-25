@@ -12,9 +12,6 @@ from functions.pca_plot import pca_plot  # Plot PCA results
 from functions.descriptive_analysis import descriptive_analysis  # Show descriptive stats
 from functions.input_histogram import input_histogram  # Display input histograms
 
-# Main app title
-st.title("Main Dashboard")
-
 ################################### DEFINE APP SECTIONS ###################################
 
 def data_analysis():
@@ -43,6 +40,15 @@ def optimisation():
 def physical_relationship_analysis():
     st.title('Physical Relationship Analysis')
     st.write("This section will contain your physical relationship analysis logic.")
+    
+    # New button for Heatsink Analysis
+    if st.button("Heatsink Analysis"):
+        # Import and call the load_heatsink_data function from functions/ethan/load_hs_data.py
+        from functions.ethan.load_hs_data import load_heatsink_data
+        df, X, y, standardised_y, mean_y, std_y = load_heatsink_data(display_output=True)
+        st.write("Heatsink data loaded successfully!")
+        st.write(df)
+
     if st.button("Go to Home"):
         st.session_state.page = 'main'
 
