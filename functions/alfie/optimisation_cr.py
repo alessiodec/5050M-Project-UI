@@ -7,77 +7,95 @@ from pymoo.optimize import minimize as minimizepymoo
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.algorithms.soo.nonconvex.de import DE
 from pymoo.operators.sampling.lhs import LHS
+import streamlit as st
 
 # Load Dataset
 csv_url = "https://drive.google.com/uc?export=download&id=10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
-data = pd.read_csv(csv_url)
+Data_ph5 = pd.read_csv(csv_url)
 
-# Extract Min and Max Values for Inputs
-min_pco2, max_pco2 = data["PCO2"].min(), data["PCO2"].max()
-min_d, max_d = data["d"].min(), data["d"].max()
-
-# Preprocessing: Standardization
-XData = data[["pH", "T", "PCO2", "v", "d"]]
-YData = data[["CR", "SR"]]
+XData = Data_ph5[["pH", "T", "PCO2", "v", "d"]]
+YData = Data_ph5[["CR", "SR"]]
 
 # Apply log transformation to selected columns
 XData["PCO2"] = np.log10(XData["PCO2"])
 XData["v"] = np.log10(XData["v"])
 XData["d"] = np.log10(XData["d"])
+XData = XData.dropna()
+YData = YData.dropna()
 
-# Initialize Scaler and Standardize Inputs
-scaler = preprocessing.StandardScaler()
-XDataScaled = scaler.fit_transform(XData).astype("float32")
-
-# Load Pre-trained Models
+# Load pre-trained models
 CorrosionModel = load_model("functions/alfie/CorrosionRateModel.keras")
 SaturationModel = load_model("functions/alfie/SaturationRateModel.keras")
 
-# Reverse scaling function for the final results
+# Create and fit scaler on the input data
+scaler = preprocessing.StandardScaler()
+XDataScaled = scaler.fit_transform(XData).astype("float32")
+
 def ReverseScalingandLog10(optimisationResult):
-    corrosionResultX = scaler.inverse_transform(optimisationResult.copy().reshape(-1, 5))
-    corrosionResultX[:, 2:] = 10**corrosionResultX[:, 2:]  # Reverse log transformation
+    """
+    Reverses the scaling and log10 transformation.
+    Expects a 1D array with 5 elements.
+    """
+    result_reshaped = optimisationResult.reshape(1, -1)
+    corrosionResultX = scaler.inverse_transform(result_reshaped)
+    corrosionResultX[:, 2:] = 10 ** corrosionResultX[:, 2:]
     return corrosionResultX
 
-# Custom Optimization Problem Class
 class MinimizeCR(ElementwiseProblem):
     def __init__(self, d, PCO2):
-        # Scale d and PCO2 using the dataset's scaler
+        # Scale the fixed parameters (d and PCO2)
+        # For d: assume it's at index 4 and for PCO2 at index 2 in the 5-feature vector.
         d_scaled = scaler.transform(np.array([0, 0, 0, 0, d]).reshape(1, -1))[0][4]
-        PCO2_scaled = scaler.transform(np.array([0, 0, PCO2, 0, 0]).reshape(1, -1))[0][2]
+        PCO2_scaled = scaler.transform(np.array([0, 0, np.log10(PCO2), 0, 0]).reshape(1, -1))[0][2]
+        self.fixed_d = d_scaled
+        self.fixed_PCO2 = PCO2_scaled
 
-        self.d = d_scaled
-        self.PCO2 = PCO2_scaled
-
-        super().__init__(
-            n_var=3,
-            n_obj=1,
-            n_ieq_constr=1,
-            xl=np.array([XDataScaled[:, 0].min(), XDataScaled[:, 1].min(), XDataScaled[:, 3].min()]),
-            xu=np.array([XDataScaled[:, 0].max(), XDataScaled[:, 1].max(), XDataScaled[:, 3].max()])
-        )
+        xl = np.array([XDataScaled[:, 0].min(), XDataScaled[:, 1].min(), XDataScaled[:, 3].min()])
+        xu = np.array([XDataScaled[:, 0].max(), XDataScaled[:, 1].max(), XDataScaled[:, 3].max()])
+        super().__init__(n_var=3, n_obj=1, n_ieq_constr=1, xl=xl, xu=xu)
 
     def _evaluate(self, X, out, *args, **kwargs):
-        X = np.array(X.reshape(1, -1))
-        X = np.append(X, self.d)
-        X = np.insert(X, 2, self.PCO2)
-        X = X.reshape(1, -1)
+        # Reconstruct full design vector: [pH, T, PCO2, v, d]
+        full_design = np.zeros(5)
+        full_design[0] = X[0]  # pH
+        full_design[1] = X[1]  # T
+        full_design[2] = self.fixed_PCO2  # PCO2 (scaled)
+        full_design[3] = X[2]  # v
+        full_design[4] = self.fixed_d   # d (scaled)
+        full_design = full_design.reshape(1, -1)
 
-        corrosionResult = CorrosionModel.predict(X, verbose=False).flatten()
-        saturationResult = SaturationModel.predict(X, verbose=False).flatten()
+        corrosionResult = CorrosionModel.predict(full_design, verbose=False).flatten()
+        saturationResult = SaturationModel.predict(full_design, verbose=False).flatten()
 
         out["F"] = corrosionResult
         out["G"] = -10**saturationResult + 1
 
-# Function to Minimize Corrosion Rate
 def minimise_cr(d, PCO2):
+    """
+    Minimises the corrosion rate for a given pipe diameter (d) and CO₂ partial pressure (PCO2).
+    
+    Args:
+        d (float): Pipe diameter (real-world value).
+        PCO2 (float): CO₂ partial pressure (real-world value).
+
+    Returns:
+        best_params (np.array): Full design vector (unscaled, real-world values).
+        min_cr (float): Minimum corrosion rate.
+    """
+    problem = MinimizeCR(d, PCO2)
     algorithmDE = DE(pop_size=30, sampling=LHS(), dither="vector")
-    result = minimizepymoo(MinimizeCR(d, np.log10(PCO2)), algorithmDE, verbose=True, termination=("n_gen", 10))
+    result = minimizepymoo(problem, algorithmDE, verbose=True, termination=("n_gen", 10))
 
-    # Convert back to real-world values
-    resultX = np.array(result.X)
-    resultX = np.insert(resultX, 2, scaler.transform(np.array([0, 0, np.log10(PCO2), 0, 0]).reshape(1, -1))[0][2])
-    resultX = np.insert(resultX, 4, scaler.transform(np.array([0, 0, 0, 0, d]).reshape(1, -1))[0][4])
+    optimized_vars = np.array(result.X)
+    full_design_scaled = np.zeros(5)
+    full_design_scaled[0] = optimized_vars[0]  # pH
+    full_design_scaled[1] = optimized_vars[1]  # T
+    full_design_scaled[2] = problem.fixed_PCO2  # PCO2 (scaled)
+    full_design_scaled[3] = optimized_vars[2]  # v
+    full_design_scaled[4] = problem.fixed_d     # d (scaled)
 
-    # Return Optimization Results
-    return f"CR = {result.F} at {ReverseScalingandLog10(resultX)}"
+    best_params = ReverseScalingandLog10(full_design_scaled)
+    min_cr = result.F[0]
+
+    return best_params, min_cr
+
