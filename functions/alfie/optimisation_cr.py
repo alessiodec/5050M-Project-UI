@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 from tensorflow.keras.models import load_model
 from sklearn import preprocessing
 from pymoo.optimize import minimize as minimizepymoo
@@ -44,83 +43,73 @@ XDataScaled = scaler.fit_transform(XData).astype("float32")
 # -------------------------------------------------------------------
 def ReverseScalingandLog10(optimisationResult):
     result_reshaped = optimisationResult.reshape(1, -1)
-    # Inverse scale
     real_values = scaler.inverse_transform(result_reshaped)
-    # Reverse the log transform for columns 2,3,4 (PCO2, v, d)
+    # Reverse log for columns 2,3,4 (PCO2, v, d)
     real_values[:, 2:] = 10 ** real_values[:, 2:]
     return real_values
 
 # -------------------------------------------------------------------
-# Define the optimization problem using pymoo
+# Define the optimization problem using pymoo.
 # The full design vector is: [pH, T, PCO2, v, d]
-# We fix PCO2 and d from user input and optimize over pH, T, and v.
+# We fix PCO2 and d from user input (after log transformation and scaling)
+# and optimize over pH, T, and v.
 # -------------------------------------------------------------------
 class MinimizeCR(ElementwiseProblem):
     def __init__(self, d, PCO2):
         """
         d: user-defined pipe diameter (real-world value)
         PCO2: user-defined CO₂ partial pressure (real-world value)
-                (We perform a log10 on PCO2 before scaling.)
         """
         # Scale the fixed parameters.
-        # For d: construct a dummy vector [0,0,0,0,d] and extract element at index 4.
+        # For d: use a dummy vector [0,0,0,0,d] and take element at index 4.
         d_scaled = scaler.transform(np.array([0, 0, 0, 0, d]).reshape(1, -1))[0][4]
-        # For PCO2: first compute log10(PCO2), then construct dummy vector [0,0, log10(PCO2), 0, 0] and take element at index 2.
+        # For PCO2: first compute log10(PCO2), then create dummy vector and extract element at index 2.
         PCO2_log = np.log10(PCO2)
         PCO2_scaled = scaler.transform(np.array([0, 0, PCO2_log, 0, 0]).reshape(1, -1))[0][2]
-
         self.fixed_d = d_scaled
         self.fixed_PCO2 = PCO2_scaled
 
-        # Our design variables are pH, T, and v, taken from columns 0, 1, and 3 respectively.
+        # Our design variables: pH (index 0), T (index 1), and v (index 3).
         xl = np.array([XDataScaled[:, 0].min(), XDataScaled[:, 1].min(), XDataScaled[:, 3].min()])
         xu = np.array([XDataScaled[:, 0].max(), XDataScaled[:, 1].max(), XDataScaled[:, 3].max()])
         super().__init__(n_var=3, n_obj=1, n_ieq_constr=1, xl=xl, xu=xu)
 
     def _evaluate(self, X, out, *args, **kwargs):
-        # X is a 1D array with 3 elements: corresponding to pH, T, and v.
         # Reconstruct the full 5-element vector: [pH, T, fixed_PCO2, v, fixed_d]
         full_design = np.zeros(5)
-        full_design[0] = X[0]       # pH
-        full_design[1] = X[1]       # T
-        full_design[2] = self.fixed_PCO2  # fixed, scaled PCO2
-        full_design[3] = X[2]       # v
-        full_design[4] = self.fixed_d     # fixed, scaled d
-
+        full_design[0] = X[0]
+        full_design[1] = X[1]
+        full_design[2] = self.fixed_PCO2
+        full_design[3] = X[2]
+        full_design[4] = self.fixed_d
         full_design = full_design.reshape(1, -1)
-        # Use the pre-trained models to predict CR and SR.
+
         corrosionResult = CorrosionModel.predict(full_design, verbose=False).flatten()
         saturationResult = SaturationModel.predict(full_design, verbose=False).flatten()
 
         out["F"] = corrosionResult
-        out["G"] = -10 ** saturationResult + 1  # Constraint: -SR + 1 <= 0
+        out["G"] = -10 ** saturationResult + 1
 
-# -------------------------------------------------------------------
-# Define the minimise_cr function.
-# d and PCO2 are provided as real-world values.
-# -------------------------------------------------------------------
 def minimise_cr(d, PCO2):
     """
     Minimises the corrosion rate (CR) for a given pipe diameter (d) and CO₂ partial pressure (PCO2).
-
     Args:
         d (float): Pipe diameter (real-world value).
         PCO2 (float): CO₂ partial pressure (real-world value).
-
     Returns:
-        best_params (np.array): Full design vector (unscaled, real-world values).
-        min_cr (float): Minimum corrosion rate.
+        best_params (np.array): The full design vector (unscaled, real-world values).
+        min_cr (float): The minimum corrosion rate.
     """
     problem = MinimizeCR(d, PCO2)
     algorithmDE = DE(pop_size=30, sampling=LHS(), dither="vector")
     result = minimizepymoo(problem, algorithmDE, verbose=True, termination=("n_gen", 10))
-
-    # Ensure that result.X is at least 1D with 3 elements.
+    
+    # Debug output: show result.X and its shape
     optimized_vars = np.atleast_1d(result.X).flatten()
+    st.write("DEBUG: Optimized variables:", optimized_vars, "Shape:", optimized_vars.shape)
     if optimized_vars.size != 3:
         raise ValueError(f"Expected optimized_vars to have 3 elements, got {optimized_vars.size}")
-
-    # Reconstruct full design vector in scaled space.
+    
     full_design_scaled = np.zeros(5)
     full_design_scaled[0] = optimized_vars[0]   # pH
     full_design_scaled[1] = optimized_vars[1]   # T
