@@ -4,6 +4,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st  # Streamlit-compatible plotting
+import warnings
 
 def run_heatsink_analysis(pop_size, pop_retention):
     """
