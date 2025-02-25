@@ -64,33 +64,39 @@ def physical_relationship_analysis():
     if st.session_state["heatsink_loaded"]:
         st.write("✅ Heatsink Data is Loaded.")
 
-        # Ensure session state variables exist
+        # Check if session state variables exist before using them
         if "pop_size" not in st.session_state:
             st.session_state.pop_size = 1000  # Default
         if "pop_retention" not in st.session_state:
             st.session_state.pop_retention = 20  # Default
 
-        # Get user input and ensure values are **integers**
+        # Get user input and ensure values are integers
         pop_size = st.number_input("Enter Population Size:", min_value=100, max_value=10000, value=st.session_state.pop_size, step=100)
         pop_retention = st.number_input("Enter Population Retention Size:", min_value=10, max_value=1000, value=st.session_state.pop_retention, step=10)
 
-        # Update session state **only if values change**
-        if pop_size != st.session_state.pop_size:
-            st.session_state.pop_size = int(pop_size)
-        if pop_retention != st.session_state.pop_retention:
-            st.session_state.pop_retention = int(pop_retention)
+        # Store user inputs in session state
+        st.session_state.pop_size = int(pop_size)
+        st.session_state.pop_retention = int(pop_retention)
 
         # Button to run analysis
         if st.button("Run Heatsink Analysis"):
             from functions.ethan.heatsink_analysis import run_heatsink_analysis
             
-            # Explicitly convert to **integer** before calling the function
-            run_heatsink_analysis(int(st.session_state.pop_size), int(st.session_state.pop_retention))
+            # Debugging: Print session state values
+            st.write(f"Running analysis with Population Size = {st.session_state.pop_size}, Population Retention = {st.session_state.pop_retention}")
+
+            # Ensure values are integers before passing
+            try:
+                pop_size_int = int(st.session_state.pop_size)
+                pop_retention_int = int(st.session_state.pop_retention)
+
+                run_heatsink_analysis(pop_size_int, pop_retention_int)
+            except Exception as e:
+                st.error(f"Error running heatsink analysis: {e}")
 
     # Go back to home button
     if st.button("Go to Home"):
         st.session_state.page = 'main'
-
 ################################### DATA ANALYSIS PAGE ###################################
 
 def contour_plots():
