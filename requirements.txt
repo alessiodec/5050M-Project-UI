@@ -9,3 +9,4 @@ gdown
 seaborn
 deap
 sympy
+pymoo
