@@ -1,5 +1,5 @@
-import Engine
-import config
+from . import Engine
+from . import config
 import time
 import numpy as np
 import matplotlib.pyplot as plt
