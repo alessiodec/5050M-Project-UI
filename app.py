@@ -80,7 +80,6 @@ def minimise_cr_page():
     st.title("Minimise Corrosion Rate (CR)")
     st.write("Enter values for pipe diameter (d) and CO₂ partial pressure (PCO₂) to find the minimum CR.")
 
-    # Load dataset to extract min and max values for d and PCO₂
     csv_url = "https://drive.google.com/uc?export=download&id=10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
     data = pd.read_csv(csv_url)
 
@@ -90,7 +89,6 @@ def minimise_cr_page():
     d = st.number_input("Enter Pipe Diameter (d):", min_value=d_min, max_value=d_max, step=0.01, value=d_min)
     pco2 = st.number_input("Enter CO₂ Partial Pressure (PCO₂):", min_value=pco2_min, max_value=pco2_max, step=0.001, value=pco2_min)
 
-    # Convert PCO₂ to log10 scale (the function will log-transform d as well)
     pco2_log = np.log10(pco2)
 
     if st.button("Run Optimisation"):
