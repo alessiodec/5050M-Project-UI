@@ -18,7 +18,11 @@ def run_heatsink_evolution(num_iterations):
         st.error("❌ Heatsink data not found! Please load it first.")
         return
 
-    new_population = Engine.initialize_population(verbose=1)  # CORRECT: Generates valid individuals
+    # Ensure X and y exist in config (needed for Engine functions)
+    config.X, config.y = st.session_state.heatsink_data[1], st.session_state.heatsink_data[3]
+
+    # Initialize population correctly (instead of using raw X values)
+    new_population = Engine.initialize_population(verbose=1)
 
     avg_fitness_arr = []
     avg_complexity_arr = []
@@ -26,6 +30,9 @@ def run_heatsink_evolution(num_iterations):
     iterations = list(range(num_iterations))
 
     start_time = time.time()
+
+    # Streamlit placeholder to update graph dynamically
+    chart_placeholder = st.empty()
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
@@ -42,19 +49,20 @@ def run_heatsink_evolution(num_iterations):
 
             st.write(f"Iter {i+1}: Best Fit={optimal_fitness:.8f}, Avg Fit={avg_fitness:.8f}, Avg Comp={avg_complexity:.5f}, Iter Time={elapsed_time:.2f}s")
 
-            # Live Graph
-            plt.figure(figsize=(8, 6))
-            plt.plot(iterations[: i+1], avg_fitness_arr, 'bo-', label="Avg Fitness")
-            plt.plot(iterations[: i+1], avg_complexity_arr, 'ro-', label="Complexity")
-            plt.plot(iterations[: i+1], best_fitness_arr, 'go-', label="Best Fitness")
+            # --- Clear previous figure and update ---
+            fig, ax = plt.subplots(figsize=(8, 6))
+            ax.plot(iterations[: i+1], avg_fitness_arr, 'bo-', label="Avg Fitness")
+            ax.plot(iterations[: i+1], avg_complexity_arr, 'ro-', label="Complexity")
+            ax.plot(iterations[: i+1], best_fitness_arr, 'go-', label="Best Fitness")
 
-            plt.xlabel("Iteration")
-            plt.ylabel("Fitness - 1-$R^2$")
-            plt.yscale("log")
-            plt.legend()
-            plt.title("Population Metrics Over Iterations")
+            ax.set_xlabel("Iteration")
+            ax.set_ylabel("Fitness - 1-$R^2$")
+            ax.set_yscale("log")
+            ax.legend()
+            ax.set_title("Population Metrics Over Iterations")
 
-            st.pyplot(plt)
+            # Update the existing plot dynamically
+            chart_placeholder.pyplot(fig)
 
             time.sleep(0.1)
 
