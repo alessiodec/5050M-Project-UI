@@ -1,178 +1,138 @@
-################################### IMPORT LIBRARIES & FUNCTIONS ###################################
-
-import streamlit as st
-import pandas as pd
 import numpy as np
+import pandas as pd
+from tensorflow.keras.models import load_model
+from sklearn import preprocessing
+from pymoo.optimize import minimize as minimizepymoo
+from pymoo.core.problem import ElementwiseProblem
+from pymoo.algorithms.soo.nonconvex.de import DE
+from pymoo.operators.sampling.lhs import LHS
+import streamlit as st
 
-from functions.load_models import load_models             # Load models
-from functions.load_preprocess_data import load_preprocess_data   # Preprocess data
-from functions.plot_5x5_cr import plot_5x5_cr               # CR contour plots
-from functions.plot_5x5_sr import plot_5x5_sr               # SR contour plots
-from functions.pca_plot import pca_plot                     # PCA plots
-from functions.descriptive_analysis import descriptive_analysis   # Descriptive stats
-from functions.input_histogram import input_histogram       # Histograms
+# -------------------------------------------------------------------
+# Load dataset and prepare data
+# -------------------------------------------------------------------
+csv_url = "https://drive.google.com/uc?export=download&id=10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
+Data_ph5 = pd.read_csv(csv_url)
 
-from functions.ethan.load_hs_data import load_heatsink_data
-from functions.ethan.heatsink_analysis import run_heatsink_analysis
-from functions.alfie.optimisation_cr import minimise_cr      # CR minimisation function
+# Keep only the data of interest
+XData = Data_ph5[["pH", "T", "PCO2", "v", "d"]]
+YData = Data_ph5[["CR", "SR"]]
 
-################################### DEFINE APP SECTIONS ###################################
+# Apply log transformation to PCO2, v, and d (as done originally)
+XData["PCO2"] = np.log10(XData["PCO2"])
+XData["v"] = np.log10(XData["v"])
+XData["d"] = np.log10(XData["d"])
+XData = XData.dropna()
+YData = YData.dropna()
 
-def data_analysis():
-    st.title('Data Analysis')
-    st.write("Perform various analyses on the dataset.")
+# -------------------------------------------------------------------
+# Load pre-trained models
+# -------------------------------------------------------------------
+CorrosionModel = load_model("functions/alfie/CorrosionRateModel.keras")
+SaturationModel = load_model("functions/alfie/SaturationRateModel.keras")
 
-    if st.button('Statistical Analysis'):
-        st.session_state.page = 'statistical_analysis'
-    if st.button('Contour Plots'):
-        st.session_state.page = 'contour_plots'
-    if st.button("Go to Home"):
-        st.session_state.page = 'main'
+# -------------------------------------------------------------------
+# Create and fit a scaler on the input data (all 5 features)
+# -------------------------------------------------------------------
+scaler = preprocessing.StandardScaler()
+XDataScaled = scaler.fit_transform(XData).astype("float32")
 
-def contour_plots():
-    st.title('Contour Plots')
-    st.write("Choose the plot to display:")
+# -------------------------------------------------------------------
+# Function to reverse scaling and log10 transformation.
+# Expects a 1D array of length 5.
+# -------------------------------------------------------------------
+def ReverseScalingandLog10(optimisationResult):
+    result_reshaped = optimisationResult.reshape(1, -1)
+    real_values = scaler.inverse_transform(result_reshaped)
+    # Reverse the log transformation for columns 2,3,4 (PCO2, v, d)
+    real_values[:, 2:] = 10 ** real_values[:, 2:]
+    return real_values
 
-    cr_model, sr_model = st.session_state.models
-    df_subset, X, scaler_X = st.session_state.data
+# -------------------------------------------------------------------
+# Define the optimization problem using pymoo.
+# The full design vector is: [pH, T, PCO2, v, d]
+# We fix PCO2 and d (after log-transforming the user input) and optimize over pH, T, and v.
+# -------------------------------------------------------------------
+class MinimizeCR(ElementwiseProblem):
+    def __init__(self, d, PCO2):
+        """
+        d: user-defined pipe diameter (original, real-world value)
+        PCO2: user-defined CO₂ partial pressure (original, real-world value)
+        """
+        # Apply log transformation to both d and PCO2 to match the dataset transformations.
+        d_log = np.log10(d)
+        d_scaled = scaler.transform(np.array([0, 0, 0, 0, d_log]).reshape(1, -1))[0][4]
+        
+        PCO2_log = np.log10(PCO2)
+        PCO2_scaled = scaler.transform(np.array([0, 0, PCO2_log, 0, 0]).reshape(1, -1))[0][2]
+        
+        self.fixed_d = d_scaled
+        self.fixed_PCO2 = PCO2_scaled
 
-    if st.button('Corrosion Rate'):
-        st.write("Generating Corrosion Rate Contour Plot...")
-        plot_5x5_cr(X, scaler_X, cr_model)
-    if st.button('Saturation Ratio'):
-        st.write("Generating Saturation Ratio Contour Plot...")
-        plot_5x5_sr(X, scaler_X, sr_model)
-    if st.button("Go to Home"):
-        st.session_state.page = 'main'
+        # Our design variables: pH (index 0), T (index 1), and v (index 3)
+        xl = np.array([XDataScaled[:, 0].min(), XDataScaled[:, 1].min(), XDataScaled[:, 3].min()])
+        xu = np.array([XDataScaled[:, 0].max(), XDataScaled[:, 1].max(), XDataScaled[:, 3].max()])
+        super().__init__(n_var=3, n_obj=1, n_ieq_constr=1, xl=xl, xu=xu)
 
-def statistical_analysis():
-    st.title('Statistical Analysis')
-    st.write("Analyze the dataset using PCA, descriptive statistics, and histograms.")
+    def _evaluate(self, X, out, *args, **kwargs):
+        # Reconstruct full design vector: [pH, T, fixed_PCO2, v, fixed_d]
+        full_design = np.zeros(5)
+        full_design[0] = X[0]       # pH
+        full_design[1] = X[1]       # T
+        full_design[2] = self.fixed_PCO2  # fixed, scaled PCO2
+        full_design[3] = X[2]       # v
+        full_design[4] = self.fixed_d     # fixed, scaled d
+        full_design = full_design.reshape(1, -1)
 
-    if 'data' not in st.session_state:
-        st.write("Data not found. Please load the data first.")
-        return
+        corrosionResult = CorrosionModel.predict(full_design, verbose=False).flatten()
+        saturationResult = SaturationModel.predict(full_design, verbose=False).flatten()
 
-    df_subset, X, scaler_X = st.session_state.data
+        out["F"] = corrosionResult
+        out["G"] = -10 ** saturationResult + 1
 
-    if st.button('PCA Analysis'):
-        st.write("Performing PCA Analysis...")
-        pca_plot()
-    if st.button('Descriptive Statistics'):
-        st.write("Generating Statistical Description...")
-        descriptive_analysis(X)
-    if st.button('Input Histograms'):
-        st.write("Generating Input Histograms...")
-        input_histogram()
-    if st.button("Go to Home"):
-        st.session_state.page = 'main'
+# -------------------------------------------------------------------
+# Define the minimise_cr function.
+# -------------------------------------------------------------------
+def minimise_cr(d, PCO2):
+    """
+    Minimises the corrosion rate (CR) for a given pipe diameter (d) and CO₂ partial pressure (PCO2).
+    
+    Args:
+        d (float): Pipe diameter (original, real-world value).
+        PCO2 (float): CO₂ partial pressure (original, real-world value).
 
-def optimisation():
-    st.title('Optimisation')
-    st.write("This section contains optimisation features.")
-
-    if st.button("Minimise CR for Given d and PCO₂"):
-        st.session_state.page = 'minimise_cr'
-    if st.button("Go to Home"):
-        st.session_state.page = 'main'
-
-def minimise_cr_page():
-    st.title("Minimise Corrosion Rate (CR)")
-    st.write("Enter values for pipe diameter (d) and CO₂ partial pressure (PCO₂) to find the minimum CR.")
-
-    # Load dataset to extract min and max values for d and PCO₂
-    csv_url = "https://drive.google.com/uc?export=download&id=10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
-    data = pd.read_csv(csv_url)
-
-    d_min, d_max = data["d"].min(), data["d"].max()
-    pco2_min, pco2_max = data["PCO2"].min(), data["PCO2"].max()
-
-    d = st.number_input("Enter Pipe Diameter (d):", min_value=d_min, max_value=d_max, step=0.01, value=d_min)
-    pco2 = st.number_input("Enter CO₂ Partial Pressure (PCO₂):", min_value=pco2_min, max_value=pco2_max, step=0.001, value=pco2_min)
-
-    # Convert PCO₂ to log10 scale
-    pco2_log = np.log10(pco2)
-
-    if st.button("Run Optimisation"):
+    Returns:
+        best_params (np.array): The full design vector (unscaled, real-world values).
+        min_cr (float): The minimum corrosion rate.
+    """
+    problem = MinimizeCR(d, PCO2)
+    algorithmDE = DE(pop_size=30, sampling=LHS(), dither="vector")
+    result = minimizepymoo(problem, algorithmDE, verbose=True, termination=("n_gen", 10))
+    
+    # Debug: Inspect result.X
+    optimized_vars = np.atleast_1d(result.X).flatten()
+    st.write("DEBUG: result.X =", result.X)
+    st.write("DEBUG: optimized_vars =", optimized_vars, "Shape:", optimized_vars.shape)
+    
+    # If optimized_vars is nested (size==1), try extracting inner array
+    if optimized_vars.size == 1:
         try:
-            best_params, min_cr = minimise_cr(d, pco2_log)
-            st.write("✅ **Optimisation Completed!**")
-            st.write(f"**Optimal Pipe Diameter (d):** {best_params[0][4]:.3f}")
-            st.write(f"**Optimal CO₂ Partial Pressure (PCO₂):** {best_params[0][2]:.3f}")
-            st.write(f"**Minimised Corrosion Rate (CR):** {min_cr:.5f}")
+            optimized_vars = np.array(result.X[0]).flatten()
+            st.write("DEBUG: Rewrapped optimized_vars =", optimized_vars, "Shape:", optimized_vars.shape)
         except Exception as e:
-            st.error(f"Error running optimisation: {e}")
+            raise ValueError("Optimization result structure is not as expected: " + str(result.X))
+    
+    if optimized_vars.size != 3:
+        raise ValueError(f"Expected optimized_vars to have 3 elements, got {optimized_vars.size}")
+    
+    full_design_scaled = np.zeros(5)
+    full_design_scaled[0] = optimized_vars[0]   # pH
+    full_design_scaled[1] = optimized_vars[1]   # T
+    full_design_scaled[2] = problem.fixed_PCO2    # fixed PCO2 (scaled)
+    full_design_scaled[3] = optimized_vars[2]   # v
+    full_design_scaled[4] = problem.fixed_d       # fixed d (scaled)
 
-    if st.button("Go to Optimisation Menu"):
-        st.session_state.page = 'optimisation'
+    best_params = ReverseScalingandLog10(full_design_scaled)
+    min_cr = result.F[0]
 
-def physical_relationship_analysis():
-    st.title('Physical Relationship Analysis')
-    st.write("This section includes heatsink analysis and related evaluations.")
-
-    if "heatsink_data" not in st.session_state:
-        st.session_state.heatsink_loaded = False
-        st.session_state.heatsink_data = None
-
-    if st.button("Load Heatsink Data"):
-        df, X, y, standardised_y, mean_y, std_y = load_heatsink_data(display_output=True)
-        st.session_state.heatsink_data = (df, X, y, standardised_y, mean_y, std_y)
-        st.session_state.heatsink_loaded = True
-        st.write("✅ Heatsink data loaded successfully!")
-        st.write(df)
-
-    if st.session_state.heatsink_loaded:
-        st.write("✅ Heatsink Data is Loaded.")
-
-        pop_size = st.number_input("Enter Population Size:", min_value=100, max_value=10000, value=1000, step=100)
-        pop_retention = st.number_input("Enter Population Retention Size:", min_value=10, max_value=1000, value=20, step=10)
-        iterations = st.number_input("Enter Number of Iterations:", min_value=1, max_value=100, value=10, step=1)
-
-        if st.button("Run Heatsink Analysis"):
-            try:
-                run_heatsink_analysis(int(pop_size), int(pop_retention), int(iterations))
-                st.write(f"Running analysis with Population Size = {pop_size}, Retention = {pop_retention}, Iterations = {iterations}")
-            except Exception as e:
-                st.error(f"Error running heatsink analysis: {e}")
-
-    if st.button("Go to Home"):
-        st.session_state.page = 'main'
-
-################################### MAIN APP ###################################
-
-def main():
-    if 'page' not in st.session_state:
-        st.session_state.page = 'main'
-
-    if 'models' not in st.session_state or 'data' not in st.session_state:
-        cr_model, sr_model = load_models()
-        df_subset, X, scaler_X = load_preprocess_data()
-        st.session_state.models = (cr_model, sr_model)
-        st.session_state.data = (df_subset, X, scaler_X)
-
-    if st.session_state.page == 'main':
-        st.title('Main Menu')
-        st.write("Select an option to proceed:")
-
-        if st.button('Data Analysis'):
-            st.session_state.page = 'data_analysis'
-        elif st.button('Optimisation'):
-            st.session_state.page = 'optimisation'
-        elif st.button('Physical Relationship Analysis'):
-            st.session_state.page = 'physical_relationship_analysis'
-
-    elif st.session_state.page == 'data_analysis':
-        data_analysis()
-    elif st.session_state.page == 'statistical_analysis':
-        statistical_analysis()
-    elif st.session_state.page == 'contour_plots':
-        contour_plots()
-    elif st.session_state.page == 'optimisation':
-        optimisation()
-    elif st.session_state.page == 'minimise_cr':
-        minimise_cr_page()
-    elif st.session_state.page == 'physical_relationship_analysis':
-        physical_relationship_analysis()
-
-if __name__ == "__main__":
-    main()
+    return best_params, min_cr
