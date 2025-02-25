@@ -18,7 +18,7 @@ def run_heatsink_evolution(num_iterations):
         st.error("❌ Heatsink data not found! Please load it first.")
         return
 
-    new_population = st.session_state.heatsink_data[1].copy()  # X values
+    new_population = Engine.initialize_population(verbose=1)  # CORRECT: Generates valid individuals
 
     avg_fitness_arr = []
     avg_complexity_arr = []
