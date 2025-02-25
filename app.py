@@ -5,12 +5,12 @@ import pandas as pd
 import numpy as np
 
 from functions.load_models import load_models             # Load models
-from functions.load_preprocess_data import load_preprocess_data   # Load & preprocess data
-from functions.plot_5x5_cr import plot_5x5_cr               # Plot corrosion rate contours
-from functions.plot_5x5_sr import plot_5x5_sr               # Plot saturation ratio contours
-from functions.pca_plot import pca_plot                     # Plot PCA results
+from functions.load_preprocess_data import load_preprocess_data   # Preprocess data
+from functions.plot_5x5_cr import plot_5x5_cr               # Contour plots for CR
+from functions.plot_5x5_sr import plot_5x5_sr               # Contour plots for SR
+from functions.pca_plot import pca_plot                     # PCA plots
 from functions.descriptive_analysis import descriptive_analysis   # Descriptive stats
-from functions.input_histogram import input_histogram       # Input histograms
+from functions.input_histogram import input_histogram       # Histograms
 
 from functions.ethan.load_hs_data import load_heatsink_data
 from functions.ethan.heatsink_analysis import run_heatsink_analysis
@@ -90,7 +90,7 @@ def minimise_cr_page():
     d = st.number_input("Enter Pipe Diameter (d):", min_value=d_min, max_value=d_max, step=0.01, value=d_min)
     pco2 = st.number_input("Enter CO₂ Partial Pressure (PCO₂):", min_value=pco2_min, max_value=pco2_max, step=0.001, value=pco2_min)
 
-    # Convert PCO₂ to log10 scale as expected by the optimisation function
+    # Convert PCO₂ to log10 scale as required by the optimisation function
     pco2_log = np.log10(pco2)
 
     if st.button("Run Optimisation"):
