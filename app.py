@@ -79,8 +79,9 @@ def physical_relationship_analysis():
         st.session_state.pop_retention = int(pop_retention)
 
         # Button to run analysis
-        if st.button("Run Heatsink Analysis"):
+        iif st.button("Run Heatsink Analysis"):
             from functions.ethan.heatsink_analysis import run_heatsink_analysis
+            run_heatsink_analysis(int(st.session_state.pop_size), int(st.session_state.pop_retention))
             
             # Debugging: Print session state values
             st.write(f"Running analysis with Population Size = {st.session_state.pop_size}, Population Retention = {st.session_state.pop_retention}")
