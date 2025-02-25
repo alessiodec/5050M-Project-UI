@@ -1,3 +1,4 @@
+import os
 import streamlit as st  # Only needed if you want to display using st.write
 import numpy as np
 import pandas as pd
@@ -6,12 +7,16 @@ import warnings
 from . import Engine
 from . import config
 
-def load_heatsink_data(file_path="Latin_Hypercube_Heatsink_1000_samples.txt", display_output=False):
+# Get absolute path to the data file
+def get_data_path(filename):
+    return os.path.join(os.path.dirname(__file__), filename)
+
+def load_heatsink_data(file_path=None, display_output=False):
     """
     Loads and processes the heatsink dataset.
     
     Parameters:
-        file_path (str): Relative path to the dataset.
+        file_path (str): Path to the dataset. If None, defaults to file in script directory.
         display_output (bool): If True, display mean, std, and DataFrame via st.write.
         
     Returns:
@@ -22,6 +27,14 @@ def load_heatsink_data(file_path="Latin_Hypercube_Heatsink_1000_samples.txt", di
         mean_y (float): Mean of y.
         std_y (float): Standard deviation of y.
     """
+    # Default file path (inside the same folder as this script)
+    if file_path is None:
+        file_path = get_data_path("Latin_Hypercube_Heatsink_1000_samples.txt")
+
+    # Check if file exists
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Dataset not found at {file_path}. Ensure the file is correctly placed.")
+
     # Read the file using a context manager
     with open(file_path, "r") as f:
         text = f.read()
