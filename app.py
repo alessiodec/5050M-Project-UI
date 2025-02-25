@@ -43,61 +43,68 @@ def optimisation():
 def physical_relationship_analysis():
     st.title('Physical Relationship Analysis')
     st.write("This section will contain your physical relationship analysis logic.")
-    
+
     # Ensure session state exists for heatsink data
     if "heatsink_data" not in st.session_state:
-        st.session_state["heatsink_loaded"] = False
-        st.session_state["heatsink_data"] = None
+        st.session_state.heatsink_loaded = False
+        st.session_state.heatsink_data = None
 
     # Button to load heatsink data
     if st.button("Load Heatsink Data"):
-        from functions.ethan.load_hs_data import load_heatsink_data
         df, X, y, standardised_y, mean_y, std_y = load_heatsink_data(display_output=True)
-        
-        st.session_state["heatsink_data"] = (df, X, y, standardised_y, mean_y, std_y)
-        st.session_state["heatsink_loaded"] = True
+
+        # Store in session state
+        st.session_state.heatsink_data = (df, X, y, standardised_y, mean_y, std_y)
+        st.session_state.heatsink_loaded = True
         
         st.write("✅ Heatsink data loaded successfully!")
         st.write(df)
 
     # Show input fields only if the data is loaded
-    if st.session_state["heatsink_loaded"]:
+    if st.session_state.heatsink_loaded:
         st.write("✅ Heatsink Data is Loaded.")
 
-        # Check if session state variables exist before using them
+        # Default session state variables
         if "pop_size" not in st.session_state:
             st.session_state.pop_size = 1000  # Default
         if "pop_retention" not in st.session_state:
             st.session_state.pop_retention = 20  # Default
 
-        # Get user input and ensure values are integers
-        pop_size = st.number_input("Enter Population Size:", min_value=100, max_value=10000, value=st.session_state.pop_size, step=100)
-        pop_retention = st.number_input("Enter Population Retention Size:", min_value=10, max_value=1000, value=st.session_state.pop_retention, step=10)
+        # Get user input and ensure values persist across reruns
+        pop_size = st.number_input(
+            "Enter Population Size:", min_value=100, max_value=10000, 
+            value=st.session_state.pop_size, step=100
+        )
+        pop_retention = st.number_input(
+            "Enter Population Retention Size:", min_value=10, max_value=1000, 
+            value=st.session_state.pop_retention, step=10
+        )
 
         # Store user inputs in session state
         st.session_state.pop_size = int(pop_size)
         st.session_state.pop_retention = int(pop_retention)
 
+        # Save values in URL parameters to prevent clearing on rerun
+        st.experimental_set_query_params(
+            pop_size=st.session_state.pop_size,
+            pop_retention=st.session_state.pop_retention
+        )
+
         # Button to run analysis
         if st.button("Run Heatsink Analysis"):
-            from functions.ethan.heatsink_analysis import run_heatsink_analysis
-            run_heatsink_analysis(int(st.session_state.pop_size), int(st.session_state.pop_retention))
-            
-            # Debugging: Print session state values
-            st.write(f"Running analysis with Population Size = {st.session_state.pop_size}, Population Retention = {st.session_state.pop_retention}")
-
-            # Ensure values are integers before passing
             try:
-                pop_size_int = int(st.session_state.pop_size)
-                pop_retention_int = int(st.session_state.pop_retention)
+                run_heatsink_analysis(st.session_state.pop_size, st.session_state.pop_retention)
 
-                run_heatsink_analysis(pop_size_int, pop_retention_int)
+                # Debugging output
+                st.write(f"Running analysis with Population Size = {st.session_state.pop_size}, Population Retention = {st.session_state.pop_retention}")
+
             except Exception as e:
                 st.error(f"Error running heatsink analysis: {e}")
 
     # Go back to home button
     if st.button("Go to Home"):
         st.session_state.page = 'main'
+
 ################################### DATA ANALYSIS PAGE ###################################
 
 def contour_plots():
