@@ -1,4 +1,4 @@
-#############https://github.com/alessiodec/5050M-Project-UI/tree/main###################### IMPORT LIBRARIES & FUNCTIONS ###################################
+################################### IMPORT LIBRARIES & FUNCTIONS ###################################
 
 import streamlit as st
 import pandas as pd
@@ -11,7 +11,9 @@ from functions.plot_5x5_sr import plot_5x5_sr  # Plot saturation ratio contours
 from functions.pca_plot import pca_plot  # Plot PCA results
 from functions.descriptive_analysis import descriptive_analysis  # Show descriptive stats
 from functions.input_histogram import input_histogram  # Display input histograms
+
 from functions.ethan.load_hs_data import load_heatsink_data
+from functions.ethan.heatsink_analysis import run_heatsink_analysis
 
 ################################### DEFINE APP SECTIONS ###################################
 
@@ -44,11 +46,13 @@ def physical_relationship_analysis():
     
     # New button for Heatsink Analysis
     if st.button("Heatsink Analysis"):
-        # Import and call the load_heatsink_data function from functions/ethan/load_hs_data.py
-        from functions.ethan.load_hs_data import load_heatsink_data
+        # Step 1: Load Heatsink Data
         df, X, y, standardised_y, mean_y, std_y = load_heatsink_data(display_output=True)
         st.write("Heatsink data loaded successfully!")
         st.write(df)
+
+        # Step 2: Run Heatsink Analysis
+        run_heatsink_analysis(X, standardised_y)
 
     if st.button("Go to Home"):
         st.session_state.page = 'main'
@@ -111,7 +115,6 @@ def main():
     # Load models and data if not already loaded
     if 'models' not in st.session_state or 'data' not in st.session_state:
         cr_model, sr_model = load_models()
-        # load_preprocess_data now returns three values
         df_subset, X, scaler_X = load_preprocess_data()
         st.session_state.models = (cr_model, sr_model)
         st.session_state.data = (df_subset, X, scaler_X)
