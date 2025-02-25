@@ -11,6 +11,7 @@ from functions.plot_5x5_sr import plot_5x5_sr  # Plot saturation ratio contours
 from functions.pca_plot import pca_plot  # Plot PCA results
 from functions.descriptive_analysis import descriptive_analysis  # Show descriptive stats
 from functions.input_histogram import input_histogram  # Display input histograms
+from functions.ethan.load_hs_data import load_heatsink_data
 
 ################################### DEFINE APP SECTIONS ###################################
 
