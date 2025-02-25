@@ -1,49 +1,45 @@
-import time
-import numpy as np
-import matplotlib.pyplot as plt
-import warnings
 import streamlit as st
-from IPython.display import clear_output
+import numpy as np
+import pandas as pd
+import time
+import warnings
+import matplotlib.pyplot as plt
 
-from . import Engine
-from . import config
+from functions.ethan import Engine, config
 
-def run_heatsink_analysis(X, standardised_y):
+def run_heatsink_analysis():
     """
-    Runs the full heatsink analysis, including population initialization,
-    simplification, evaluation, and real-time Pareto front visualization.
-
-    Parameters:
-        X (ndarray): Feature array
-        standardised_y (ndarray): Standardized target variable
+    Runs the full heatsink analysis after the dataset is loaded.
+    This function initializes a population, simplifies it, and visualizes the Pareto front dynamically.
     """
-    st.write("Initializing Heatsink Analysis...")
+    st.write("### Running Heatsink Analysis...")
 
-    # CELL 3: Configuration Setup
-    config.X = X
-    config.y = standardised_y
-
+    # --- CONFIGURE PARAMETERS ---
     config.POPULATION_SIZE = 1000
     config.POPULATION_RETENTION_SIZE = 20
     config.FIT_THRESHOLD = 10
 
-    st.write("Configuration set up successfully.")
+    st.write("Population Size:", config.POPULATION_SIZE)
+    st.write("Population Retention Size:", config.POPULATION_RETENTION_SIZE)
+    st.write("Fitness Threshold:", config.FIT_THRESHOLD)
 
-    # CELL 4: Initialize and Evaluate Population
+    # --- INITIALIZE AND EVALUATE POPULATION ---
+    st.write("### Initializing Population...")
     start_time = time.time()
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         init_population = Engine.initialize_population(verbose=1)
 
-    st.write("Initial Population Evaluated:")
-    for i, individual in enumerate(init_population[:10]):  # Display only first 10 for readability
-        st.write(f"{i}: Fitness={individual.fitness:.4f}, Complexity={individual.complexity}, Eq={individual.individual}")
+        # Display individuals in Streamlit instead of printing
+        for i, individual in enumerate(init_population):
+            st.write(f"{i}: Fitness={individual.fitness:.4f}, Complexity={individual.complexity}, Eq={individual.individual}")
 
     Engine.evaluate_population(init_population)
     st.write(f"Elapsed time: {time.time() - start_time:.2f} seconds")
 
-    # CELL 5: Simplify and Evaluate Population
+    # --- SIMPLIFY POPULATION ---
+    st.write("### Simplifying Population...")
     start_time = time.time()
 
     with warnings.catch_warnings():
@@ -51,32 +47,37 @@ def run_heatsink_analysis(X, standardised_y):
         simplified_pop = Engine.simplify_and_clean_population(init_population)
 
     Engine.evaluate_population(simplified_pop)
-    st.write("Simplified Population Evaluated.")
     st.write(f"Elapsed time: {time.time() - start_time:.2f} seconds")
 
-    # CELL 6: Real-Time Pareto Front Visualization
+    # --- PARETO FRONT VISUALIZATION ---
+    st.write("### Pareto Front Visualization")
+
+    # Calculate Pareto front and prepare data arrays
     pareto_front = Engine.return_pareto_front(init_population)
     pareto_plot_data = np.array([(ind.fitness, ind.complexity) for ind in pareto_front])
     population_plot_data = np.array([(ind.fitness, ind.complexity) for ind in init_population])
     utopia_point = [min(population_plot_data[:, 1]), min(population_plot_data[:, 0])]
 
-    st.write("Generating real-time Pareto front visualization...")
+    # Streamlit Dynamic Plot
+    plot_placeholder = st.empty()  # Placeholder for updating the plot dynamically
 
+    # Iterate over population points and update the scatter plot dynamically
     for i in range(1, len(population_plot_data) + 1):
-        clear_output(wait=True)
-        plt.figure(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(8, 6))
 
         # Plot the current subset of population data
-        plt.scatter(population_plot_data[:i, 1], population_plot_data[:i, 0], s=15, label="Population")
-        plt.scatter(pareto_plot_data[:, 1], pareto_plot_data[:, 0], s=15, color='red', label="Pareto Front")
-        plt.scatter(utopia_point[0], utopia_point[1], s=50, color='green', label="Utopia Point")
+        ax.scatter(population_plot_data[:i, 1], population_plot_data[:i, 0], s=15, label="Population")
+        ax.scatter(pareto_plot_data[:, 1], pareto_plot_data[:, 0], s=15, color='red', label="Pareto Front")
+        ax.scatter(utopia_point[0], utopia_point[1], s=50, color='green', label="Utopia Point")
 
-        plt.yscale("log")
-        plt.xlabel("Complexity")
-        plt.ylabel("Fitness")
-        plt.legend()
-        plt.title("Real-Time Update: Pareto Front & Population")
-        st.pyplot(plt)  # Display in Streamlit
-        time.sleep(0.01)
+        ax.set_yscale("log")
+        ax.set_xlabel("Complexity")
+        ax.set_ylabel("Fitness")
+        ax.legend()
+        ax.set_title("Real-Time Update: Pareto Front & Population")
 
-    st.write("Heatsink Analysis Completed!")
+        plot_placeholder.pyplot(fig)  # Update the plot in Streamlit
+
+        time.sleep(0.01)  # Small delay for visualization
+
+    st.write("Pareto Front Visualization Complete!")
