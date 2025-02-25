@@ -22,15 +22,11 @@ def data_analysis():
     st.write("This section will contain your data analysis logic.")
 
     # Create buttons for statistical analysis and contour plots
-    statistical_analysis_button = st.button('Statistical Analysis')
-    contour_button = st.button('Contour Plots')
-
-    if statistical_analysis_button:
+    if st.button('Statistical Analysis'):
         st.session_state.page = 'statistical_analysis'
-    if contour_button:
+    if st.button('Contour Plots'):
         st.session_state.page = 'contour_plots'
 
-    # Home button
     if st.button("Go to Home"):
         st.session_state.page = 'main'
 
@@ -101,7 +97,6 @@ def physical_relationship_analysis():
             except Exception as e:
                 st.error(f"Error running heatsink analysis: {e}")
 
-    # Go back to home button
     if st.button("Go to Home"):
         st.session_state.page = 'main'
 
@@ -115,12 +110,10 @@ def contour_plots():
     cr_model, sr_model = st.session_state.models
     df_subset, X, scaler_X = st.session_state.data
 
-    # Button for Corrosion Rate contour plot
     if st.button('Corrosion Rate'):
         st.write("Generating Corrosion Rate Contour Plot...")
         plot_5x5_cr(X, scaler_X, cr_model)
 
-    # Button for Saturation Ratio contour plot
     if st.button('Saturation Ratio'):
         st.write("Generating Saturation Ratio Contour Plot...")
         plot_5x5_sr(X, scaler_X, sr_model)
