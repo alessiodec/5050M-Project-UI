@@ -4,17 +4,17 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-from functions.load_models import load_models            # Load the models
-from functions.load_preprocess_data import load_preprocess_data  # Load & preprocess data
-from functions.plot_5x5_cr import plot_5x5_cr              # Plot corrosion rate contours
-from functions.plot_5x5_sr import plot_5x5_sr              # Plot saturation ratio contours
-from functions.pca_plot import pca_plot                    # Plot PCA results
-from functions.descriptive_analysis import descriptive_analysis  # Show descriptive stats
-from functions.input_histogram import input_histogram      # Display input histograms
+from functions.load_models import load_models             # Load models
+from functions.load_preprocess_data import load_preprocess_data   # Load & preprocess data
+from functions.plot_5x5_cr import plot_5x5_cr               # Plot corrosion rate contours
+from functions.plot_5x5_sr import plot_5x5_sr               # Plot saturation ratio contours
+from functions.pca_plot import pca_plot                     # Plot PCA results
+from functions.descriptive_analysis import descriptive_analysis   # Descriptive stats
+from functions.input_histogram import input_histogram       # Input histograms
 
 from functions.ethan.load_hs_data import load_heatsink_data
 from functions.ethan.heatsink_analysis import run_heatsink_analysis
-from functions.alfie.optimisation_cr import minimise_cr   # CR Minimisation Function
+from functions.alfie.optimisation_cr import minimise_cr      # CR minimisation function
 
 ################################### DEFINE APP SECTIONS ###################################
 
@@ -78,9 +78,9 @@ def optimisation():
 
 def minimise_cr_page():
     st.title("Minimise Corrosion Rate (CR)")
-    st.write("Enter values for pipe diameter (d) and CO₂ partial pressure (PCO₂) to minimize CR.")
+    st.write("Enter values for pipe diameter (d) and CO₂ partial pressure (PCO₂) to find the minimum CR.")
 
-    # Load dataset to extract min and max values for d and PCO₂
+    # Load dataset to extract min and max for d and PCO₂
     csv_url = "https://drive.google.com/uc?export=download&id=10GtBpEkWIp4J-miPzQrLIH6AWrMrLH-o"
     data = pd.read_csv(csv_url)
 
@@ -90,7 +90,7 @@ def minimise_cr_page():
     d = st.number_input("Enter Pipe Diameter (d):", min_value=d_min, max_value=d_max, step=0.01, value=d_min)
     pco2 = st.number_input("Enter CO₂ Partial Pressure (PCO₂):", min_value=pco2_min, max_value=pco2_max, step=0.001, value=pco2_min)
 
-    # Convert PCO₂ to log10 scale as required by the optimisation function
+    # Convert PCO₂ to log10 scale as expected by the optimisation function
     pco2_log = np.log10(pco2)
 
     if st.button("Run Optimisation"):
@@ -144,14 +144,12 @@ def main():
     if 'page' not in st.session_state:
         st.session_state.page = 'main'
 
-    # Load models and preprocessed data if not already loaded
     if 'models' not in st.session_state or 'data' not in st.session_state:
         cr_model, sr_model = load_models()
         df_subset, X, scaler_X = load_preprocess_data()
         st.session_state.models = (cr_model, sr_model)
         st.session_state.data = (df_subset, X, scaler_X)
 
-    # Navigation based on session state
     if st.session_state.page == 'main':
         st.title('Main Menu')
         st.write("Select an option to proceed:")
