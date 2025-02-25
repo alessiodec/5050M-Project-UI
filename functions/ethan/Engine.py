@@ -8,7 +8,7 @@
 # simplify_and_clean_population() -> requires FITNESS_THRESHOLD
 
 # Create a Datatype for individuals to have (Dont need to keep recalculating stuff)
-import config
+from . import config
 import random
 import numpy as np
 import warnings
