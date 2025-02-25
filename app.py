@@ -14,7 +14,7 @@ from functions.input_histogram import input_histogram  # Display input histogram
 
 from functions.ethan.load_hs_data import load_heatsink_data
 from functions.ethan.heatsink_analysis import run_heatsink_analysis
-from functions.ethan.optimisation_cr import minimise_cr  # New function for CR minimisation
+from functions.alfie.optimisation_cr import minimise_cr
 
 ################################### DEFINE APP SECTIONS ###################################
 
