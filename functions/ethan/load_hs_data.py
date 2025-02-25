@@ -3,12 +3,7 @@ import numpy as np
 import pandas as pd
 import warnings
 
-import sys
-import os
-# Add the repository root to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-
-import Engine
+from . import Engine
 import config
 
 def load_heatsink_data(file_path="Latin_Hypercube_Heatsink_1000_samples.txt", display_output=False):
