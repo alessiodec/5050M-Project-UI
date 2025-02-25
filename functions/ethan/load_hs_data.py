@@ -4,7 +4,7 @@ import pandas as pd
 import warnings
 
 from . import Engine
-import config
+from . import config
 
 def load_heatsink_data(file_path="Latin_Hypercube_Heatsink_1000_samples.txt", display_output=False):
     """
