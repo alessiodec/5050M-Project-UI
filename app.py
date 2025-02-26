@@ -27,14 +27,14 @@ def data_analysis_home():
     if st.button('Statistical Analysis'):
         st.session_state.page = 'statistical_analysis'
         st.session_state.sub_page = 'statistical_analysis'
-        st.experimental_rerun()
+        return
     if st.button('Contour Plots'):
         st.session_state.page = 'contour_plots'
         st.session_state.sub_page = 'contour_plots'
-        st.experimental_rerun()
+        return
     if st.button("Go to Home"):
         st.session_state.page = 'Data Analysis'
-        st.experimental_rerun()
+        return
 
 
 def statistical_analysis():
@@ -59,7 +59,7 @@ def statistical_analysis():
     if st.button("Go to Home"):
         st.session_state.page = 'Data Analysis'
         st.session_state.sub_page = None
-        st.experimental_rerun()
+        return
 
 
 def contour_plots():
@@ -78,7 +78,7 @@ def contour_plots():
     if st.button("Go to Home"):
         st.session_state.page = 'Data Analysis'
         st.session_state.sub_page = None
-        st.experimental_rerun()
+        return
 
 
 # --- Optimisation Section ---
@@ -90,11 +90,11 @@ def optimisation_home():
     if st.button("Minimise CR for Given d and PCO₂"):
         st.session_state.page = 'minimise_cr'
         st.session_state.sub_page = 'minimise_cr'
-        st.experimental_rerun()
+        return
     if st.button("Go to Home"):
         st.session_state.page = 'Optimisation'
         st.session_state.sub_page = None
-        st.experimental_rerun()
+        return
 
 
 def minimise_cr_page():
@@ -123,7 +123,7 @@ def minimise_cr_page():
     if st.button("Go to Optimisation Menu"):
         st.session_state.page = 'Optimisation'
         st.session_state.sub_page = None
-        st.experimental_rerun()
+        return
 
 
 # --- Physical Relationship Analysis Section ---
@@ -159,7 +159,7 @@ def physical_relationship_analysis():
 
     if st.button("Go to Home"):
         st.session_state.page = 'Physical Relationship Analysis'
-        st.experimental_rerun()
+        return
 
 
 ################################### MAIN APP ###################################
