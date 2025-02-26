@@ -26,10 +26,10 @@ def data_analysis_home():
     
     if st.button('Statistical Analysis'):
         st.session_state.sub_page = 'statistical_analysis'
-        st.experimental_rerun()
+        return
     if st.button('Contour Plots'):
         st.session_state.sub_page = 'contour_plots'
-        st.experimental_rerun()
+        return
 
 def statistical_analysis():
     st.title('Statistical Analysis')
@@ -52,7 +52,7 @@ def statistical_analysis():
         input_histogram()
     if st.button("Go to Home"):
         st.session_state.sub_page = None
-        st.experimental_rerun()
+        return
 
 def contour_plots():
     st.title('Contour Plots')
@@ -69,7 +69,7 @@ def contour_plots():
         plot_5x5_sr(X, scaler_X, sr_model)
     if st.button("Go to Home"):
         st.session_state.sub_page = None
-        st.experimental_rerun()
+        return
 
 # --- Optimisation Section ---
 
@@ -79,10 +79,10 @@ def optimisation_home():
 
     if st.button("Minimise CR for Given d and PCO₂"):
         st.session_state.sub_page = 'minimise_cr'
-        st.experimental_rerun()
+        return
     if st.button("Go to Home"):
         st.session_state.sub_page = None
-        st.experimental_rerun()
+        return
 
 def minimise_cr_page():
     st.title("Minimise Corrosion Rate (CR)")
@@ -106,10 +106,9 @@ def minimise_cr_page():
             st.write(f"**Minimised Corrosion Rate (CR):** {min_cr:.5f}")
         except Exception as e:
             st.error(f"Error running optimisation: {e}")
-
     if st.button("Go to Optimisation Menu"):
         st.session_state.sub_page = None
-        st.experimental_rerun()
+        return
 
 # --- Physical Relationship Analysis Section ---
 
@@ -143,7 +142,8 @@ def physical_relationship_analysis():
                 st.error(f"Error running heatsink analysis: {e}")
 
     if st.button("Go to Home"):
-        st.experimental_rerun()
+        # For this section, a "Go to Home" simply keeps you on the same page.
+        return
 
 ################################### MAIN APP ###################################
 
@@ -161,15 +161,12 @@ def main():
         st.session_state.models = (cr_model, sr_model)
         st.session_state.data = (df_subset, X, scaler_X)
 
-    # Sidebar navigation: the radio button is now the single source of truth.
+    # Sidebar navigation: the radio button is the single source of truth.
     options = ["Data Analysis", "Optimisation", "Physical Relationship Analysis"]
     selected_tab = st.sidebar.radio("Navigation", options, index=options.index(st.session_state.main_tab))
-    if selected_tab != st.session_state.main_tab:
-        st.session_state.main_tab = selected_tab
-        st.session_state.sub_page = None  # reset subpage when main tab changes
-        st.experimental_rerun()
+    st.session_state.main_tab = selected_tab
 
-    # Render page content based on the main_tab and sub_page.
+    # Render page content based on main_tab and sub_page.
     if st.session_state.main_tab == "Data Analysis":
         if st.session_state.sub_page is None:
             data_analysis_home()
