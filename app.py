@@ -18,33 +18,18 @@ from functions.alfie.optimisation_cr import minimise_cr      # CR minimisation f
 
 ################################### DEFINE APP SECTIONS ###################################
 
-def data_analysis():
+# --- Data Analysis Section ---
+
+def data_analysis_home():
     st.title('Data Analysis')
     st.write("Perform various analyses on the dataset.")
-
+    
     if st.button('Statistical Analysis'):
-        st.session_state.page = 'statistical_analysis'
+        st.session_state.sub_page = 'statistical_analysis'
+        st.experimental_rerun()
     if st.button('Contour Plots'):
-        st.session_state.page = 'contour_plots'
-    # Return to Data Analysis home (instead of the removed main menu)
-    if st.button("Go to Home"):
-        st.session_state.page = 'Data Analysis'
-
-def contour_plots():
-    st.title('Contour Plots')
-    st.write("Choose the plot to display:")
-
-    cr_model, sr_model = st.session_state.models
-    df_subset, X, scaler_X = st.session_state.data
-
-    if st.button('Corrosion Rate'):
-        st.write("Generating Corrosion Rate Contour Plot...")
-        plot_5x5_cr(X, scaler_X, cr_model)
-    if st.button('Saturation Ratio'):
-        st.write("Generating Saturation Ratio Contour Plot...")
-        plot_5x5_sr(X, scaler_X, sr_model)
-    if st.button("Go to Home"):
-        st.session_state.page = 'Data Analysis'
+        st.session_state.sub_page = 'contour_plots'
+        st.experimental_rerun()
 
 def statistical_analysis():
     st.title('Statistical Analysis')
@@ -66,16 +51,38 @@ def statistical_analysis():
         st.write("Generating Input Histograms...")
         input_histogram()
     if st.button("Go to Home"):
-        st.session_state.page = 'Data Analysis'
+        st.session_state.sub_page = None
+        st.experimental_rerun()
 
-def optimisation():
+def contour_plots():
+    st.title('Contour Plots')
+    st.write("Choose the plot to display:")
+
+    cr_model, sr_model = st.session_state.models
+    df_subset, X, scaler_X = st.session_state.data
+
+    if st.button('Corrosion Rate'):
+        st.write("Generating Corrosion Rate Contour Plot...")
+        plot_5x5_cr(X, scaler_X, cr_model)
+    if st.button('Saturation Ratio'):
+        st.write("Generating Saturation Ratio Contour Plot...")
+        plot_5x5_sr(X, scaler_X, sr_model)
+    if st.button("Go to Home"):
+        st.session_state.sub_page = None
+        st.experimental_rerun()
+
+# --- Optimisation Section ---
+
+def optimisation_home():
     st.title('Optimisation')
     st.write("This section contains optimisation features.")
 
     if st.button("Minimise CR for Given d and PCO₂"):
-        st.session_state.page = 'minimise_cr'
+        st.session_state.sub_page = 'minimise_cr'
+        st.experimental_rerun()
     if st.button("Go to Home"):
-        st.session_state.page = 'Optimisation'
+        st.session_state.sub_page = None
+        st.experimental_rerun()
 
 def minimise_cr_page():
     st.title("Minimise Corrosion Rate (CR)")
@@ -90,7 +97,6 @@ def minimise_cr_page():
     d = st.number_input("Enter Pipe Diameter (d):", min_value=d_min, max_value=d_max, step=0.01, value=d_min)
     pco2 = st.number_input("Enter CO₂ Partial Pressure (PCO₂):", min_value=pco2_min, max_value=pco2_max, step=0.001, value=pco2_min)
 
-    # User inputs are original values; the optimisation function will apply np.log10.
     if st.button("Run Optimisation"):
         try:
             best_params, min_cr = minimise_cr(d, pco2)
@@ -102,7 +108,10 @@ def minimise_cr_page():
             st.error(f"Error running optimisation: {e}")
 
     if st.button("Go to Optimisation Menu"):
-        st.session_state.page = 'Optimisation'
+        st.session_state.sub_page = None
+        st.experimental_rerun()
+
+# --- Physical Relationship Analysis Section ---
 
 def physical_relationship_analysis():
     st.title('Physical Relationship Analysis')
@@ -134,57 +143,47 @@ def physical_relationship_analysis():
                 st.error(f"Error running heatsink analysis: {e}")
 
     if st.button("Go to Home"):
-        st.session_state.page = 'Physical Relationship Analysis'
+        st.experimental_rerun()
 
 ################################### MAIN APP ###################################
 
 def main():
-    # Initialize the navigation page if not already set.
-    if 'page' not in st.session_state:
-        st.session_state.page = 'Data Analysis'
-    
+    # Initialize main navigation state if not set.
+    if 'main_tab' not in st.session_state:
+        st.session_state.main_tab = "Data Analysis"
+    if 'sub_page' not in st.session_state:
+        st.session_state.sub_page = None
+
     # Load models and data if not already present.
     if 'models' not in st.session_state or 'data' not in st.session_state:
         cr_model, sr_model = load_models()
         df_subset, X, scaler_X = load_preprocess_data()
         st.session_state.models = (cr_model, sr_model)
         st.session_state.data = (df_subset, X, scaler_X)
-        
-    # Map current session_state.page to its main tab
-    if st.session_state.page in ["data_analysis", "statistical_analysis", "contour_plots", "Data Analysis"]:
-        default_tab = "Data Analysis"
-    elif st.session_state.page in ["optimisation", "minimise_cr", "Optimisation"]:
-        default_tab = "Optimisation"
-    elif st.session_state.page in ["physical_relationship_analysis", "Physical Relationship Analysis"]:
-        default_tab = "Physical Relationship Analysis"
-    else:
-        default_tab = "Data Analysis"
-        
-    options = ["Data Analysis", "Optimisation", "Physical Relationship Analysis"]
-    default_index = options.index(default_tab)
-    
-    # Sidebar navigation: the radio buttons act as tabs.
-    main_tab = st.sidebar.radio("Navigation", options, index=default_index)
-    
-    # If user selects a different main tab from the sidebar, update the page.
-    if main_tab != default_tab:
-        st.session_state.page = main_tab
 
-    # Render page content based on the current navigation state.
-    if st.session_state.page == "Data Analysis":
-        data_analysis()
-    elif st.session_state.page == "statistical_analysis":
-        statistical_analysis()
-    elif st.session_state.page == "contour_plots":
-        contour_plots()
-    elif st.session_state.page == "Optimisation":
-        optimisation()
-    elif st.session_state.page == "minimise_cr":
-        minimise_cr_page()
-    elif st.session_state.page == "Physical Relationship Analysis":
+    # Sidebar navigation: the radio button is now the single source of truth.
+    options = ["Data Analysis", "Optimisation", "Physical Relationship Analysis"]
+    selected_tab = st.sidebar.radio("Navigation", options, index=options.index(st.session_state.main_tab))
+    if selected_tab != st.session_state.main_tab:
+        st.session_state.main_tab = selected_tab
+        st.session_state.sub_page = None  # reset subpage when main tab changes
+        st.experimental_rerun()
+
+    # Render page content based on the main_tab and sub_page.
+    if st.session_state.main_tab == "Data Analysis":
+        if st.session_state.sub_page is None:
+            data_analysis_home()
+        elif st.session_state.sub_page == 'statistical_analysis':
+            statistical_analysis()
+        elif st.session_state.sub_page == 'contour_plots':
+            contour_plots()
+    elif st.session_state.main_tab == "Optimisation":
+        if st.session_state.sub_page is None:
+            optimisation_home()
+        elif st.session_state.sub_page == 'minimise_cr':
+            minimise_cr_page()
+    elif st.session_state.main_tab == "Physical Relationship Analysis":
         physical_relationship_analysis()
-    else:
-        st.write("")  # Blank main area if no matching page
 
 if __name__ == "__main__":
     main()
